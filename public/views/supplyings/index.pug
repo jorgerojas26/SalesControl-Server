@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Supplyings
+    body
+    ul
+      each supplying in supplyings
+       li= supplying.product.name
+        ul
+         li="Cantidad: "+ supplying.quantity
+         li="Precio: "+ supplying.price
+         li="Proveedor: " + supplying.supplier.name
+         li="Fecha de compra: " + supplying.createdAt

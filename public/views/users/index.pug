@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Users
+    body
+     ul
+      each user in users
+       li="Email: "+ user.email
+        ul
+         li="Address: " + user.address
+         li="Hashed Password: " + user.password
+         li="Phone number: " + user.phoneNumber
+         li= "Permissions: " + user.permissions
+      
