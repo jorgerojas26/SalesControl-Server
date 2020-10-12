@@ -10,7 +10,7 @@ const crypto = require("crypto")
 
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, path.join(__dirname, "client", "public", "productImages"))
+        callback(null, path.join(__dirname, "client", "build", "productImages"))
     },
     filename: function (req, file, callback) {
         crypto.pseudoRandomBytes(16, function (err, raw) {
@@ -39,7 +39,8 @@ const DiscountRoutes = require("./routes/discount_routes");
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.static(path.join(__dirname, "public")));
+
+
 
 app.use(upload.single("productImageFile"), productRoutes);
 app.use(categoryRoutes);
@@ -54,7 +55,12 @@ app.use(inventoryRoutes);
 app.use(DolarReferenceRoutes);
 app.use(DiscountRoutes);
 
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.listen(3001, function () {
-    console.log("Server on port 3001");
+app.get('/*', function (request, response) {
+    response.sendFile(path.resolve(__dirname, "client/build", 'index.html'));
+});
+
+app.listen(process.env.PORT || 80, function () {
+    console.log("Server on port 80");
 });
