@@ -15,6 +15,8 @@ module.exports = {
             "supplier",
             "product"
         ]
+        queryObject.order = [["createdAt", "DESC"]]
+
 
         if (id) {
             queryObject.where = {

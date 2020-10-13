@@ -25,6 +25,7 @@ module.exports = {
                 }],
                 group: ["id"]
             }]
+            queryObject.order = [["createdAt", "DESC"]]
             if (productName) queryObject.include = {
                 model: SaleProducts,
                 as: "saleProducts",
