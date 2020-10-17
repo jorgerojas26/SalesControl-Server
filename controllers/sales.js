@@ -26,11 +26,13 @@ module.exports = {
                 group: ["id"]
             }]
             queryObject.order = [["createdAt", "DESC"]]
+
             if (productName) queryObject.include = {
                 model: SaleProducts,
                 as: "saleProducts",
                 include: [{
                     model: Product,
+                    as: "product",
                     where: {
                         name: { [Op.like]: `%${productName}%` }
                     }
@@ -95,9 +97,18 @@ module.exports = {
 
             if (group) {
                 res.Model = SaleProducts;
+                let productWhereStatement = {};
+                if (productId) {
+                    productWhereStatement.productId = productId;
+                }
+                if (productName) {
+                    productWhereStatement.productName = productName
+                }
+
                 queryObject.include = {
                     model: Product,
-                    as: "product"
+                    as: "product",
+                    where: productWhereStatement
                 }
                 queryObject.attributes = {
                     include: [
@@ -105,8 +116,10 @@ module.exports = {
                         [Sequelize.literal("IFNULL(saleProducts.price * SUM(saleProducts.quantity), 0)"), "grossTotalDollars"]
                     ]
                 }
+
                 queryObject.group = ["productId"]
             }
+
             if (from && to) {
                 queryObject.where = Sequelize.literal(`DATE(saleProducts.createdAt) BETWEEN "${from}" AND "${to}"`);
             }

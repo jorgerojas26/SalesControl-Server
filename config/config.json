@@ -4,7 +4,13 @@
     "password": null,
     "database": "supermercado-melquisedec",
     "host": "127.0.0.1",
-    "dialect": "mariadb"
+    "dialect": "mariadb",
+    "dialectOptions": {
+      "useUTC": false,
+      "dateStrings": true,
+      "timezone": "-04:00"
+    },
+    "timezone": "-04:00"
   },
   "test": {
     "username": "root",

@@ -8,6 +8,10 @@ var multer = require('multer')
 const path = require("path")
 const crypto = require("crypto")
 
+const moment = require("moment");
+
+Date.prototype.toJSON = function () { return moment(this.toLocaleString('es-VE', { timeZone: 'America/Caracas' })).add(1, "hours").format("DD/MM/YYYY hh:mm:ss A"); }
+
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, path.join(__dirname, "client", "build", "productImages"))
@@ -62,5 +66,5 @@ app.get('/*', function (request, response) {
 });
 
 app.listen(process.env.PORT || 80, function () {
-    console.log("Server on port 80");
+    console.log("Server on port: " + process.env.PORT || 80);
 });
