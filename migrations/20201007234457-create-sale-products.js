@@ -21,12 +21,13 @@ module.exports = {
       saleId: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        onDelete: "CASCADE",
         references: {
           model: {
             tableName: "Sales",
           },
           key: "id"
-        }
+        },
       },
       quantity: {
         allowNull: false,

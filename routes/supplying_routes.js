@@ -8,6 +8,9 @@ const paginatedRequest = require("../middlewares/paginatedRequest");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 
 router.route("/api/supplyings").get(SupplyingsController.index, paginatedRequest(Supplying))
-    .post(isAuthenticated, SupplyingsController.create);
+    .post(isAuthenticated, SupplyingsController.create)
+
+router.route("/api/supplyings/:id")
+    .delete(isAuthenticated, SupplyingsController.destroy)
 
 module.exports = router;

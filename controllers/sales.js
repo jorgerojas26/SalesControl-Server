@@ -156,7 +156,14 @@ module.exports = {
             res.status(401).json({ err: "Insuficcient permissions" });
         }
     },
-    show: function (req, res) {
-
+    destroy: async function (req, res) {
+        if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
+            let { id } = req.params;
+            await Sales.destroy({ where: { id } })
+            res.sendStatus(204);
+        }
+        else {
+            res.status(401).json({ err: "Insufficient permissions" })
+        }
     }
 }
