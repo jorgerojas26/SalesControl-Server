@@ -33,10 +33,13 @@ module.exports = {
                 include: [{
                     model: Product,
                     as: "product",
-                    where: {
-                        name: { [Op.like]: `%${productName}%` }
+                    //separate: true
+                }],
+                where: {
+                    productId: {
+                        [Op.in]: Sequelize.literal(`(SELECT id FROM Products WHERE Products.name LIKE '%${productName}%' GROUP BY id HAVING count(id) = 1)`)
                     }
-                }]
+                },
             };
 
             if (productId) queryObject.include = {
@@ -98,11 +101,12 @@ module.exports = {
             if (group) {
                 res.Model = SaleProducts;
                 let productWhereStatement = {};
+
                 if (productId) {
-                    productWhereStatement.productId = productId;
+                    productWhereStatement.id = productId;
                 }
                 if (productName) {
-                    productWhereStatement.productName = productName
+                    productWhereStatement.name = { [Op.like]: `%${productName}%` }
                 }
 
                 queryObject.include = {

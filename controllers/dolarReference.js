@@ -19,6 +19,19 @@ module.exports = {
         }
     },
     create: function (req, res) {
-
+        if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
+            console.log(req.body);
+            try {
+                DolarReference.create({
+                    price: req.body.price
+                })
+                res.sendStatus(204);
+            } catch (error) {
+                res.status(500).json({ error })
+            }
+        }
+        else {
+            next("Insuficcient permissions")
+        }
     }
 }
