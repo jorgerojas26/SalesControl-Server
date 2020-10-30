@@ -11,6 +11,8 @@ router.route("/api/products")
     .get(ProductsController.index, paginatedRequest(Product))
     .post(isAuthenticated, ProductsController.create);
 
-router.route("/api/products/:id").patch(isAuthenticated, ProductsController.update)
+router.route("/api/products/:id")
+    .patch(isAuthenticated, ProductsController.update)
+    .delete(isAuthenticated, ProductsController.destroy)
 
 module.exports = router;

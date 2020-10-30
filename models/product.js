@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Product.belongsToMany(models.Category, {
         through: "ProductCategories",
-        as: "category"
+        as: "category",
+        onDelete: "CASCADE"
       });
       Product.hasMany(models.Supplying, {
         as: "supplying",
