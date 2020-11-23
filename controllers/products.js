@@ -82,7 +82,7 @@ module.exports = {
                         name: req.body.name,
                         price: 0,
                         profitPercent: req.body.profitPercent,
-                        imagePath: (req.file) ? "\\productImages" + req.file.path.split("productImages")[1] : null
+                        image: (req.file) ? req.file.buffer : null,
                     });
                     let productWithCategories = await product.addCategory(req.body.categories.split(","));
                     res.status(200).json(productWithCategories);
@@ -101,7 +101,7 @@ module.exports = {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let { id } = req.params;
             let { name, profitPercent, categories } = req.body;
-            console.log(profitPercent);
+
             if (name && profitPercent && categories) {
                 let product = await Product.findOne({
                     include: ["category"],
@@ -115,21 +115,33 @@ module.exports = {
                         order: [["id", "DESC"]],
                     })
                     if (supplying) {
-                        let productUpdated = await Product.update({
-                            name,
-                            imagePath: (req.file) ? "\\productImages" + req.file.path.split("productImages")[1] : null,
-                            price: Sequelize.literal(`ROUND(${supplying.price} + (${supplying.price} * (${profitPercent} / 100)), 2)`),
-                            profitPercent,
-                            categories
-                        }, { where: { id } })
+                        if (req.file) {
+                            let productUpdated = await Product.update({
+                                name,
+                                image: req.file.buffer,
+                                price: Sequelize.literal(`ROUND(${supplying.price} + (${supplying.price} * (${profitPercent} / 100)), 2)`),
+                                profitPercent,
+                                categories
+                            }, { where: { id } })
+                            product.setCategory(req.body.categories.split(","));
+                            res.status(200).json(productUpdated)
+                        }
+                        else {
+                            let productUpdated = await Product.update({
+                                name,
+                                price: Sequelize.literal(`ROUND(${supplying.price} + (${supplying.price} * (${profitPercent} / 100)), 2)`),
+                                profitPercent,
+                                categories
+                            }, { where: { id } })
+                            product.setCategory(req.body.categories.split(","));
+                            res.status(200).json(productUpdated)
+                        }
 
-                        product.setCategory(req.body.categories.split(","));
-                        res.status(200).json(productUpdated)
                     }
                     else {
                         let productUpdated = await Product.update({
                             name,
-                            imagePath: (req.file) ? "\\productImages" + req.file.path.split("productImages")[1] : null,
+                            image: (req.file) ? req.file.buffer : null,
                             profitPercent,
                             categories
                         }, { where: { id } })

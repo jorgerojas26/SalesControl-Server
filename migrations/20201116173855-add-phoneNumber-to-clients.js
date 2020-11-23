@@ -1,12 +1,14 @@
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("Products", "imagePath", {
+    await queryInterface.addColumn("Clients", "phoneNumber", {
       type: Sequelize.STRING,
-      after: "price"
-    })
+      after: "cedula"
+    });
   },
+
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn("Products", "imagePath")
+    await queryInterface.removeColumn("Clients", "phoneNumber");
   }
 };

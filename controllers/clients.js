@@ -56,15 +56,44 @@ module.exports = {
     },
     create: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let client = await Clients.create({
-                name: req.body.name,
-                cedula: req.body.cedula
-            });
-            res.json(client)
+            try {
+                let client = await Clients.create({
+                    name: req.body.name,
+                    cedula: req.body.cedula,
+                    phoneNumber: req.body.phoneNumber
+                });
+                res.status(200).json(client)
+            } catch (error) {
+                res.json({ error })
+            }
+
         } else {
             res.status(401).json({ err: "Insuficcient permissions" });
         }
 
+    },
+    update: async function (req, res) {
+        if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
+            let { id } = req.params;
+            let { name, cedula, phoneNumber } = req.body;
+
+            if (name != null && cedula != null && phoneNumber != null) {
+                let client = await Clients.update(
+                    {
+                        name,
+                        cedula,
+                        phoneNumber
+                    }
+                    , { where: { id } })
+                res.status(200).json(client)
+            }
+            else {
+                res.status(409).json({ error: "No data provided" })
+            }
+        }
+        else {
+            res.status(401).json({ error: "Insufficient permissions" })
+        }
     },
     show: function (req, res) {
 

@@ -26,11 +26,11 @@ module.exports = (Model) => {
             results.count = await Model.count(queryObject);
 
             if (results.count.length >= 0) {
-                results.recordsTotal = results.count.length
+                results.recordsTotal = results.data.length
                 results.recordsFiltered = results.count.length
             }
             else {
-                results.recordsTotal = results.count;
+                results.recordsTotal = results.data.length;
                 results.recordsFiltered = results.count;
             }
 

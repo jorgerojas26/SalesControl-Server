@@ -10,4 +10,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 router.route("/api/clients").get(isAuthenticated, ClientsController.index, paginatedRequest(Client))
     .post(isAuthenticated, ClientsController.create);
 
+router.route("/api/clients/:id")
+    .put(isAuthenticated, ClientsController.update)
+
 module.exports = router;

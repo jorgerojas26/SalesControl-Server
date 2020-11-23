@@ -61,11 +61,7 @@ module.exports = {
 
             if (createdAt) {
                 queryObject.where = {
-                    createdAt: {
-                        [Op.gte]: moment(createdAt).format("YYYY-MM-DD HH:mm:ss"),
-                        [Op.lte]: moment(createdAt).add(1, "days").format("YYYY-MM-DD HH:mm:ss")
-
-                    }
+                    createdAt: Sequelize.literal(`DATE(Sales.createdAt) = "${createdAt}"`),
                 }
             }
 
@@ -79,22 +75,19 @@ module.exports = {
                 }
                 else if (operation == "lte") {
                     queryObject.where = {
-                        createdAt: Sequelize.literal(`DATE(saleProducts.createdAt) <= "${createdAt}"`)
+                        createdAt: Sequelize.literal(`DATE(SaleProducts.createdAt) <= "${createdAt}"`)
                     }
                 }
                 else if (operation == "eq") {
                     queryObject.where = {
-                        createdAt: Sequelize.literal(`DATE(saleProducts.createdAt) = "${createdAt}"`)
+                        createdAt: Sequelize.literal(`DATE(SaleProducts.createdAt) = "${createdAt}"`)
                     }
                 }
             }
 
             if (updatedAt) {
                 queryObject.where = {
-                    updatedAt: {
-                        [Op.gte]: moment(updatedAt).format("YYYY-MM-DD HH:mm:ss"),
-                        [Op.lte]: moment(updatedAt).add(1, "days").format("YYYY-MM-DD HH:mm:ss")
-                    }
+                    updatedAt: Sequelize.literal(`DATE(Sales.updatedAt) = "${createdAt}"`),
                 }
             }
 
@@ -116,8 +109,8 @@ module.exports = {
                 }
                 queryObject.attributes = {
                     include: [
-                        [Sequelize.literal("IFNULL(SUM(saleProducts.quantity),0)"), "salesTotal"],
-                        [Sequelize.literal("IFNULL(saleProducts.price * SUM(saleProducts.quantity), 0)"), "grossTotalDollars"]
+                        [Sequelize.literal("IFNULL(SUM(SaleProducts.quantity),0)"), "salesTotal"],
+                        [Sequelize.literal("IFNULL(SaleProducts.price * SUM(SaleProducts.quantity), 0)"), "grossTotalDollars"]
                     ]
                 }
 
@@ -125,7 +118,7 @@ module.exports = {
             }
 
             if (from && to) {
-                queryObject.where = Sequelize.literal(`DATE(saleProducts.createdAt) BETWEEN "${from}" AND "${to}"`);
+                queryObject.where = Sequelize.literal(`DATE(SaleProducts.createdAt) BETWEEN "${from}" AND "${to}"`);
             }
             res.queryObject = queryObject;
             next();

@@ -77,11 +77,11 @@ module.exports = {
                 res.status(200).json(category)
             }
             else {
-                res.status(409).json({ err: "No data provided" })
+                res.status(409).json({ error: "No data provided" })
             }
         }
         else {
-            res.status(401).json({ err: "Insufficient permissions" })
+            res.status(401).json({ error: "Insufficient permissions" })
         }
 
     },
@@ -92,7 +92,7 @@ module.exports = {
             res.sendStatus(204);
         }
         else {
-            res.status(401).json({ err: "Insufficient permissions" })
+            res.status(401).json({ error: "Insufficient permissions" })
         }
     }
 }

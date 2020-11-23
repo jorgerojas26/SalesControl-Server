@@ -40,10 +40,11 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.TEXT,
     price: DataTypes.FLOAT,
     profitPercent: DataTypes.FLOAT,
-    imagePath: DataTypes.STRING
+    image: DataTypes.BLOB("long")
   }, {
     sequelize,
     modelName: 'Product',
+    tableName: "products"
   });
 
   return Product;

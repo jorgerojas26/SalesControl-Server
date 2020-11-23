@@ -9,9 +9,9 @@ const path = require("path")
 const crypto = require("crypto")
 
 const moment = require("moment");
+Date.prototype.toJSON = function () { return moment(this.toLocaleString('es-VE', { timeZone: 'America/Caracas' })).format("DD/MM/YYYY hh:mm:ss A"); }
 
-Date.prototype.toJSON = function () { return moment(this.toLocaleString('es-VE', { timeZone: 'America/Caracas' })).add(1, "hours").format("DD/MM/YYYY hh:mm:ss A"); }
-
+/*
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, path.join(__dirname, "client", "build", "productImages"))
@@ -24,8 +24,8 @@ var storage = multer.diskStorage({
         });
     }
 });
-
-var upload = multer({ storage });
+*/
+var upload = multer(multer.memoryStorage());
 
 const productRoutes = require("./routes/product_routes");
 const categoryRoutes = require("./routes/category_routes");
@@ -39,6 +39,7 @@ const imageRoutes = require("./routes/image_routes");
 const inventoryRoutes = require("./routes/inventory_routes");
 const DolarReferenceRoutes = require("./routes/dolarReference_routes");
 const DiscountRoutes = require("./routes/discount_routes");
+const DebtRoutes = require("./routes/debt_routes");
 
 
 app.use(bodyParser.json())
@@ -58,6 +59,7 @@ app.use(imageRoutes);
 app.use(inventoryRoutes);
 app.use(DolarReferenceRoutes);
 app.use(DiscountRoutes);
+app.use(DebtRoutes);
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 

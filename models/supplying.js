@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Supplying',
+    tableName: "supplyings"
   });
 
   Supplying.afterCreate(async (supplying, options) => {
