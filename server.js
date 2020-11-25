@@ -13,21 +13,17 @@ Date.prototype.toJSON = function () {
     return moment(this).format("DD/MM/YYYY hh:mm:ss A");
 }
 
-/*
+
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, path.join(__dirname, "client", "build", "productImages"))
     },
     filename: function (req, file, callback) {
-        crypto.pseudoRandomBytes(16, function (err, raw) {
-            if (err) return callback(err);
-
-            callback(null, raw.toString('hex') + path.extname(file.originalname));
-        });
+        callback(null, file.originalname);
     }
 });
-*/
-var upload = multer(multer.memoryStorage());
+
+var upload = multer({ storage });
 
 const productRoutes = require("./routes/product_routes");
 const categoryRoutes = require("./routes/category_routes");
@@ -46,8 +42,6 @@ const DebtRoutes = require("./routes/debt_routes");
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-
-
 
 app.use(upload.single("productImageFile"), productRoutes);
 app.use(categoryRoutes);

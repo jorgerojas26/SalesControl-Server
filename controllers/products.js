@@ -82,7 +82,7 @@ module.exports = {
                         name: req.body.name,
                         price: 0,
                         profitPercent: req.body.profitPercent,
-                        image: (req.file) ? req.file.buffer : null,
+                        imagePath: (req.file) ? "\\productImages\\" + req.file.filename : null,
                     });
                     let productWithCategories = await product.addCategory(req.body.categories.split(","));
                     res.status(200).json(productWithCategories);
@@ -118,7 +118,7 @@ module.exports = {
                         if (req.file) {
                             let productUpdated = await Product.update({
                                 name,
-                                image: req.file.buffer,
+                                imagePath: "\\productImages\\" + req.file.filename,
                                 price: Sequelize.literal(`ROUND(${supplying.price} + (${supplying.price} * (${profitPercent} / 100)), 2)`),
                                 profitPercent,
                                 categories

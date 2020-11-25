@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.TEXT,
     price: DataTypes.FLOAT,
     profitPercent: DataTypes.FLOAT,
-    image: DataTypes.BLOB("long")
+    imagePath: DataTypes.BLOB("long")
   }, {
     sequelize,
     modelName: 'Product',

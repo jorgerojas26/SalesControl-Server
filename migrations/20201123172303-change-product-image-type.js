@@ -18,7 +18,8 @@ module.exports = {
       await queryInterface.renameColumn("Products", "image", "imagePath");
     } catch (error) {
 
-    } await queryInterface.changeColumn('Products', 'imagePath', {
+    }
+    await queryInterface.changeColumn('Products', 'imagePath', {
       type: Sequelize.TEXT,
       allowNull: true
     });
