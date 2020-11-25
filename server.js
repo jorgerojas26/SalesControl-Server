@@ -9,7 +9,9 @@ const path = require("path")
 const crypto = require("crypto")
 
 const moment = require("moment");
-Date.prototype.toJSON = function () { return moment(this.toLocaleString('es-VE', { timeZone: 'America/Caracas' })).format("DD/MM/YYYY hh:mm:ss A"); }
+Date.prototype.toJSON = function () {
+    return moment(this).format("DD/MM/YYYY hh:mm:ss A");
+}
 
 /*
 var storage = multer.diskStorage({

@@ -4,7 +4,13 @@
     "password": null,
     "database": "supermercado-melquisedec",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialectOptions": {
+      "useUTC": false,
+      "dateStrings": true,
+      "timezone": "-04:00"
+    },
+    "dialect": "mysql",
+    "timezone": "-04:00"
   },
   "test": {
     "username": "root",
@@ -18,7 +24,7 @@
     "password": "Jj20Rr3$",
     "database": "supermercado-melquisedec",
     "host": "103.195.100.3",
-    "dialect": "mariadb",
+    "dialect": "mysql",
     "dialectOptions": {
       "useUTC": false,
       "dateStrings": true,

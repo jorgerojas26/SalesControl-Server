@@ -15,11 +15,11 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.renameColumn("Products", "imagePath", "image");
+      await queryInterface.renameColumn("Products", "image", "imagePath");
     } catch (error) {
 
-    } await queryInterface.changeColumn('Products', 'image', {
-      type: Sequelize.BLOB("long"),
+    } await queryInterface.changeColumn('Products', 'imagePath', {
+      type: Sequelize.TEXT,
       allowNull: true
     });
   }

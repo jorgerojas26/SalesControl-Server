@@ -23,26 +23,26 @@ module.exports = async function (req, res, next) {
             include: [
                 [
                     sequelize.literal(`(
-                        SELECT IFNULL(SUM(supplying.quantity), 0) FROM Supplyings as supplying
+                        SELECT IFNULL(SUM(supplying.quantity), 0) FROM supplyings as supplying
                         WHERE supplying.productId = Product.id
                     )`),
                     "supplyingsTotal"
                 ],
                 [
                     sequelize.literal(`(
-                            SELECT IFNULL(SUM(sales.quantity), 0) FROM SaleProducts as sales
+                            SELECT IFNULL(SUM(sales.quantity), 0) FROM saleproducts as sales
                             WHERE sales.productId = Product.id
                         )`),
                     "salesTotal"
                 ],
                 [sequelize.literal(`(
-                        SELECT IFNULL(SUM(supplying.quantity), 0) FROM Supplyings as supplying
-                        WHERE supplying.productId = Product.id) - (SELECT IFNULL(SUM(sales.quantity), 0) FROM SaleProducts as sales
+                        SELECT IFNULL(SUM(supplying.quantity), 0) FROM supplyings as supplying
+                        WHERE supplying.productId = Product.id) - (SELECT IFNULL(SUM(sales.quantity), 0) FROM saleproducts as sales
                         WHERE sales.productId = Product.id)`),
                     "stock"
                 ]
             ],
-            exclude: ["imagePath", "createdAt", "updatedAt", "price"]
+            exclude: ["image", "createdAt", "updatedAt", "price"]
         },
             res.queryObject = queryObject;
         next();
