@@ -131,7 +131,7 @@ module.exports = {
             let products = req.body.products;
 
             let sale = await Sales.create({});
-
+            console.log(products);
             products.forEach(product => {
                 sale.addProduct(product.id, {
                     through: {

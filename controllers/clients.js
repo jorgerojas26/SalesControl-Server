@@ -9,13 +9,16 @@ module.exports = {
     index: async function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let { id, name, cedula, createdAt, updatedAt, from, to } = req.query;
+            console.log(req.query);
 
             let queryObject = {};
+
             if (id) {
                 queryObject.where = {
                     id
                 }
             }
+
             if (name) {
                 queryObject.where = {
                     name: { [Op.like]: `%${name}%` }
@@ -49,6 +52,7 @@ module.exports = {
             if (from && to) {
                 queryObject.where = Sequelize.literal(`DATE(Clients.createdAt) BETWEEN "${from}" AND "${to}"`);
             }
+            res.queryObject = queryObject;
             next();
         } else {
             res.status(401).json({ err: "Insuficcient permissions" });

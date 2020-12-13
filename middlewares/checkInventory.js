@@ -8,7 +8,9 @@ module.exports = async function (req, res, next) {
         let { id, name } = req.query;
 
         let queryObject = {};
-
+        queryObject.include = [
+            "discount"
+        ]
         if (name) queryObject.where = {
             name: { [Op.like]: `%${name}%` }
         };
@@ -42,7 +44,7 @@ module.exports = async function (req, res, next) {
                     "stock"
                 ]
             ],
-            exclude: ["image", "createdAt", "updatedAt", "price"]
+            exclude: ["createdAt", "updatedAt"]
         },
             res.queryObject = queryObject;
         next();
