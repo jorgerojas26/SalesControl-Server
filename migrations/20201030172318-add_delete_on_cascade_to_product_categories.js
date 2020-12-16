@@ -3,16 +3,16 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.removeConstraint("ProductCategories", "onDeleteCascade");
+      await queryInterface.removeConstraint("productcategories", "onDeleteCascade");
     } catch (error) {
 
     }
-    await queryInterface.addConstraint("ProductCategories", {
+    await queryInterface.addConstraint("productcategories", {
       fields: ["productId"],
       type: "foreign key",
       name: "onDeleteCascade",
       references: {
-        table: "Products",
+        table: "products",
         field: "id"
       },
       onDelete: "CASCADE"
@@ -22,16 +22,16 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     try {
-      await queryInterface.removeConstraint("ProductCategories", "onDeleteCascade");
+      await queryInterface.removeConstraint("productcategories", "onDeleteCascade");
     } catch (error) {
 
     }
-    await queryInterface.addConstraint("ProductCategories", {
+    await queryInterface.addConstraint("productcategories", {
       fields: ["productId"],
       type: "foreign key",
       name: "onDeleteCascade",
       references: {
-        table: "Products",
+        table: "products",
         field: "id"
       },
       onDelete: "RESTRICT"

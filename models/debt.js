@@ -1,26 +1,26 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Debt extends Model {
     static associate(models) {
-
       Debt.belongsTo(models.Client, {
-        as: "client",
-      })
-
+        as: 'client',
+      });
     }
-  };
-  Debt.init({
-    clientId: DataTypes.INTEGER,
-    type: DataTypes.TINYINT,
-    total: DataTypes.FLOAT,
-    cancelled: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'Debt',
-    tableName: "debts"
-  });
+  }
+  Debt.init(
+    {
+      clientId: DataTypes.INTEGER,
+      type: DataTypes.TINYINT,
+      total: DataTypes.FLOAT,
+      cancelled: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: 'Debt',
+      tableName: 'debts',
+    },
+  );
   return Debt;
 };
+

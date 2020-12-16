@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "Jj20Rr3$",
+    "password": null,
     "database": "supermercado-melquisedec",
     "host": "127.0.0.1",
     "dialectOptions": {
