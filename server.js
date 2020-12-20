@@ -10,20 +10,19 @@ const crypto = require('crypto');
 
 const moment = require('moment');
 Date.prototype.toJSON = function () {
-  return moment(this).format('DD/MM/YYYY hh:mm:ss A');
+    return moment(this).format('DD/MM/YYYY hh:mm:ss A');
 };
 
 var storage = multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, path.join(__dirname, 'client', 'build', 'productImages'));
-  },
-  filename: function (req, file, callback) {
-    callback(null, file.originalname);
-  },
+    destination: function (req, file, callback) {
+        callback(null, path.join(__dirname, 'client', 'build', 'productImages'));
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.originalname);
+    },
 });
 
 var upload = multer({ storage });
-
 const productRoutes = require('./routes/product_routes');
 const categoryRoutes = require('./routes/category_routes');
 const supplyingsRoutes = require('./routes/supplying_routes');
@@ -58,9 +57,9 @@ app.use(DebtRoutes);
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.get('/*', function (request, response) {
-  response.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
+    response.sendFile(path.resolve(__dirname, 'client/build', 'index.html'));
 });
 
 app.listen(process.env.PORT || 80, function () {
-  console.log('Server on port: ' + process.env.PORT || 80);
+    console.log('Server on port: ' + process.env.PORT || 80);
 });
