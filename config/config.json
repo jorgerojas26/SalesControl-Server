@@ -4,12 +4,12 @@
     "password": null,
     "database": "supermercado-melquisedec",
     "host": "127.0.0.1",
+    "dialect": "mysql",
     "dialectOptions": {
       "useUTC": false,
       "dateStrings": true,
       "timezone": "-04:00"
     },
-    "dialect": "mysql",
     "timezone": "-04:00"
   },
   "test": {
