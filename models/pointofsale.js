@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
         {
             paymentId: DataTypes.INTEGER,
             ticketId: DataTypes.INTEGER,
-            amount: DataTypes.FLOAT,
         },
         {
             sequelize,
@@ -21,4 +20,3 @@ module.exports = (sequelize, DataTypes) => {
     );
     return pointofsale;
 };
-

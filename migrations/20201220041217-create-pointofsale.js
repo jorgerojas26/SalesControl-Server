@@ -11,13 +11,13 @@ module.exports = {
             paymentId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+                references: {
+                    model: 'payments',
+                    key: 'id',
+                },
             },
             ticketId: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
-            },
-            amount: {
-                type: Sequelize.FLOAT,
                 allowNull: false,
             },
             createdAt: {
@@ -34,4 +34,3 @@ module.exports = {
         await queryInterface.dropTable('pointofsales');
     },
 };
-

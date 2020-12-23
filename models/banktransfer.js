@@ -6,13 +6,16 @@ module.exports = (sequelize, DataTypes) => {
             banktransfer.belongsTo(models.payment, {
                 as: 'payment',
             });
+
+            banktransfer.belongsTo(models.bank, {
+                as: 'bank',
+            });
         }
     }
     banktransfer.init(
         {
             paymentId: DataTypes.INTEGER,
             referenceCod: DataTypes.INTEGER,
-            amount: DataTypes.FLOAT,
             bankId: DataTypes.INTEGER,
         },
         {
@@ -22,4 +25,3 @@ module.exports = (sequelize, DataTypes) => {
     );
     return banktransfer;
 };
-

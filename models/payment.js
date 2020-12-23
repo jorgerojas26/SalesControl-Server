@@ -27,6 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         {
             saleId: DataTypes.INTEGER,
             paymentMethodId: DataTypes.INTEGER,
+            amount: DataTypes.FLOAT,
+            currency: DataTypes.TEXT,
         },
         {
             sequelize,
@@ -35,4 +37,3 @@ module.exports = (sequelize, DataTypes) => {
     );
     return payment;
 };
-

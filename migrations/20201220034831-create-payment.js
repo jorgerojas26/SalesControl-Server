@@ -11,9 +11,25 @@ module.exports = {
             saleId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+                references: {
+                    model: 'sales',
+                    key: 'id',
+                },
             },
             paymentMethodId: {
                 type: Sequelize.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'paymentmethods',
+                    key: 'id',
+                },
+            },
+            amount: {
+                type: Sequelize.FLOAT,
+                allowNull: false,
+            },
+            currency: {
+                type: Sequelize.TEXT,
                 allowNull: false,
             },
             createdAt: {
@@ -30,4 +46,3 @@ module.exports = {
         await queryInterface.dropTable('payments');
     },
 };
-

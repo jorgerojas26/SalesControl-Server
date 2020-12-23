@@ -135,9 +135,9 @@ module.exports = {
     },
     create: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let { products, clientId, isPaid } = req.body;
+            let { products, clientId, isPaid, payment } = req.body;
 
-            if (products && clientId && isPaid) {
+            if (products && clientId && isPaid && payment) {
                 try {
                     const result = await sequelize.transaction(async t => {
                         const sale = await Sales.create(
@@ -158,6 +158,10 @@ module.exports = {
                                 transaction: t,
                             });
                         }
+
+                        sale.setPayments([payment], {
+                            transaction: t,
+                        });
                         return sale;
                     });
                     res.status(200).json(result);
@@ -182,4 +186,3 @@ module.exports = {
         }
     },
 };
-
