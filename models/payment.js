@@ -6,11 +6,6 @@ module.exports = (sequelize, DataTypes) => {
             payment.belongsTo(models.paymentmethod, {
                 as: 'paymentmethod',
             });
-            payment.hasMany(models.cash, {
-                as: 'cash',
-                foreignKey: 'paymentId',
-                sourceKey: 'id',
-            });
             payment.hasMany(models.pointofsale, {
                 as: 'pointofsale',
                 foreignKey: 'paymentId',
