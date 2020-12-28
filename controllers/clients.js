@@ -1,9 +1,9 @@
-const Clients = require("../models").Client;
+const Clients = require('../models').Client;
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-const moment = require("moment");
+const moment = require('moment');
 
 module.exports = {
     index: async function (req, res, next) {
@@ -15,39 +15,38 @@ module.exports = {
 
             if (id) {
                 queryObject.where = {
-                    id
-                }
+                    id,
+                };
             }
 
             if (name) {
                 queryObject.where = {
-                    name: { [Op.like]: `%${name}%` }
-                }
+                    name: { [Op.like]: `%${name}%` },
+                };
             }
 
             if (cedula) {
                 queryObject.where = {
-                    cedula: { [Op.like]: `${cedula}%` }
-                }
+                    cedula: { [Op.like]: `${cedula}%` },
+                };
             }
 
             if (createdAt) {
                 queryObject.where = {
                     createdAt: {
-                        [Op.gte]: moment(createdAt).format("YYYY-MM-DD HH:mm:ss"),
-                        [Op.lte]: moment(createdAt).add(1, "days").format("YYYY-MM-DD HH:mm:ss")
-
-                    }
-                }
+                        [Op.gte]: moment(createdAt).format('YYYY-MM-DD HH:mm:ss'),
+                        [Op.lte]: moment(createdAt).add(1, 'days').format('YYYY-MM-DD HH:mm:ss'),
+                    },
+                };
             }
 
             if (updatedAt) {
                 queryObject.where = {
                     updatedAt: {
-                        [Op.gte]: moment(updatedAt).format("YYYY-MM-DD HH:mm:ss"),
-                        [Op.lte]: moment(updatedAt).add(1, "days").format("YYYY-MM-DD HH:mm:ss")
-                    }
-                }
+                        [Op.gte]: moment(updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+                        [Op.lte]: moment(updatedAt).add(1, 'days').format('YYYY-MM-DD HH:mm:ss'),
+                    },
+                };
             }
             if (from && to) {
                 queryObject.where = Sequelize.literal(`DATE(Clients.createdAt) BETWEEN "${from}" AND "${to}"`);
@@ -55,7 +54,7 @@ module.exports = {
             res.queryObject = queryObject;
             next();
         } else {
-            res.status(401).json({ err: "Insuficcient permissions" });
+            res.status(401).json({ err: 'Insuficcient permissions' });
         }
     },
     create: async function (req, res) {
@@ -64,17 +63,15 @@ module.exports = {
                 let client = await Clients.create({
                     name: req.body.name,
                     cedula: req.body.cedula,
-                    phoneNumber: req.body.phoneNumber
+                    phoneNumber: req.body.phoneNumber,
                 });
-                res.status(200).json(client)
+                res.status(200).json(client);
             } catch (error) {
-                res.json({ error })
+                res.json({ error });
             }
-
         } else {
-            res.status(401).json({ err: "Insuficcient permissions" });
+            res.status(401).json({ err: 'Insuficcient permissions' });
         }
-
     },
     update: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
@@ -86,20 +83,17 @@ module.exports = {
                     {
                         name,
                         cedula,
-                        phoneNumber
-                    }
-                    , { where: { id } })
-                res.status(200).json(client)
+                        phoneNumber,
+                    },
+                    { where: { id } },
+                );
+                res.status(200).json(client);
+            } else {
+                res.status(409).json({ error: 'No data provided' });
             }
-            else {
-                res.status(409).json({ error: "No data provided" })
-            }
-        }
-        else {
-            res.status(401).json({ error: "Insufficient permissions" })
+        } else {
+            res.status(401).json({ error: 'Insufficient permissions' });
         }
     },
-    show: function (req, res) {
-
-    }
-}
+    show: function (req, res) {},
+};
