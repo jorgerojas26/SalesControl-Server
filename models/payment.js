@@ -6,12 +6,12 @@ module.exports = (sequelize, DataTypes) => {
             payment.belongsTo(models.paymentmethod, {
                 as: 'paymentmethod',
             });
-            payment.hasMany(models.pointofsale, {
+            payment.hasOne(models.pointofsale, {
                 as: 'pointofsale',
                 foreignKey: 'paymentId',
                 sourceKey: 'id',
             });
-            payment.hasMany(models.banktransfer, {
+            payment.hasOne(models.banktransfer, {
                 as: 'banktransfer',
                 foreignKey: 'paymentId',
                 sourceKey: 'id',

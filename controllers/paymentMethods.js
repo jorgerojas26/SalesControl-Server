@@ -9,7 +9,7 @@ module.exports = {
         }
     },
     create: async function (req, res) {
-        if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
+        if (req.user.permissions >= process.env.MASTER_PERMISSION) {
             const { name, isActive } = req.body;
 
             if (name && isActive) {

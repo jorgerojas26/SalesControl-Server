@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     banktransfer.init(
         {
             paymentId: DataTypes.INTEGER,
-            referenceCod: DataTypes.INTEGER,
+            referenceCode: DataTypes.INTEGER,
             bankId: DataTypes.INTEGER,
         },
         {
