@@ -2,7 +2,7 @@ const Sales = require('../models').Sales;
 const SaleProducts = require('../models').SaleProducts;
 const Product = require('../models').Product;
 const PaymentMethod = require('../models').paymentmethod;
-const sequelize = require('../models').sequelize;
+const sequelizeModel = require('../models').sequelize;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -155,7 +155,7 @@ module.exports = {
                 }
                 if (allPaymentsActive) {
                     try {
-                        const result = await sequelize.transaction(async t => {
+                        const result = await sequelizeModel.transaction(async t => {
                             const sale = await Sales.create(
                                 {
                                     clientId,
@@ -181,7 +181,7 @@ module.exports = {
                                     switch (payment.paymentMethodId) {
                                         case 1:
                                             if (paymentDetails.referenceCode && paymentDetails.bankId) {
-                                                let newPayment = await sale.createPayment(
+                                                await sale.createPayment(
                                                     {
                                                         ...payment,
                                                         banktransfer: {
@@ -197,7 +197,7 @@ module.exports = {
                                             break;
                                         case 2:
                                             if (paymentDetails.ticketId) {
-                                                let newPayment = await sale.createPayment(
+                                                await sale.createPayment(
                                                     {
                                                         ...payment,
                                                         pointofsale: {
@@ -212,7 +212,7 @@ module.exports = {
                                             break;
                                         case 3:
                                             if (paymentDetails) {
-                                                let newPayment = await sale.createPayment(payment, { transaction: t });
+                                                await sale.createPayment(payment, { transaction: t });
                                             } else {
                                                 throw 'Incorrect payment details';
                                             }
@@ -240,6 +240,8 @@ module.exports = {
         }
     },
     destroy: async function (req, res) {
+        res.status(401).json({ error: 'No permitido' });
+        /*
         if (req.user.permissions >= process.env.MASTER_PERMISSION) {
             let { id } = req.params;
             await Sales.destroy({ where: { id } });
@@ -247,5 +249,6 @@ module.exports = {
         } else {
             res.status(401).json({ error: 'Insufficient permissions' });
         }
+        */
     },
 };
