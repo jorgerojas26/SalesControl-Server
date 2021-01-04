@@ -37,6 +37,7 @@ const DolarReferenceRoutes = require('./routes/dolarReference_routes');
 const DiscountRoutes = require('./routes/discount_routes');
 const DebtRoutes = require('./routes/debt_routes');
 const PaymentMethodsRoutes = require('./routes/paymentMethods_routes');
+const BankRoutes = require('./routes/bank_routes');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -55,6 +56,7 @@ app.use(DolarReferenceRoutes);
 app.use(DiscountRoutes);
 app.use(DebtRoutes);
 app.use(PaymentMethodsRoutes);
+app.use(BankRoutes);
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 

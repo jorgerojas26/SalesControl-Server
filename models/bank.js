@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             bankName: DataTypes.TEXT,
             accountNumber: DataTypes.TEXT,
-            idNumber: DataTypes.TEXT,
+            ownerDocNumber: DataTypes.TEXT,
             accountType: DataTypes.TEXT,
             ownerName: DataTypes.TEXT,
         },
@@ -25,4 +25,3 @@ module.exports = (sequelize, DataTypes) => {
     );
     return bank;
 };
-

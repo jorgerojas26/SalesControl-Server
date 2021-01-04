@@ -139,7 +139,7 @@ module.exports = {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let { products, clientId, isPaid, payments } = req.body;
 
-            if (products && clientId && isPaid && payments) {
+            if (products && clientId && isPaid != null && payments) {
                 let allPaymentsActive = true;
                 for (payment of payments) {
                     let paymentMethod = await PaymentMethod.findByPk(payment.paymentMethodId);
@@ -211,12 +211,7 @@ module.exports = {
                                             }
                                             break;
                                         case 3:
-                                            if (paymentDetails) {
-                                                await sale.createPayment(payment, { transaction: t });
-                                            } else {
-                                                throw 'Incorrect payment details';
-                                            }
-
+                                            await sale.createPayment(payment, { transaction: t });
                                             break;
                                     }
                                 } else {
