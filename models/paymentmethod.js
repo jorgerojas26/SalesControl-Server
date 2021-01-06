@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     class paymentmethod extends Model {
         static associate(models) {
             paymentmethod.hasMany(models.payment, {
-                foreignKey: 'paymentmethodId',
+                foreignKey: 'paymentMethodId',
                 sourceKey: 'id',
             });
         }
@@ -21,4 +21,3 @@ module.exports = (sequelize, DataTypes) => {
     );
     return paymentmethod;
 };
-

@@ -211,7 +211,25 @@ module.exports = {
                                             }
                                             break;
                                         case 3:
-                                            await sale.createPayment(payment, { transaction: t });
+                                            if (payment.currency == 'Bs') {
+                                                await sale.createPayment(payment, { transaction: t });
+                                            } else if (payment.currency == 'USD') {
+                                                if (paymentDetails.dolarReference) {
+                                                    await sale.createPayment(
+                                                        {
+                                                            ...payment,
+                                                            cash: {
+                                                                dolarReference: paymentDetails.dolarReference,
+                                                            },
+                                                        },
+                                                        { transaction: t, include: 'cash' },
+                                                    );
+                                                } else {
+                                                    throw 'Incorrect payment details';
+                                                }
+                                            } else {
+                                                throw 'Incorrect currency';
+                                            }
                                             break;
                                     }
                                 } else {
