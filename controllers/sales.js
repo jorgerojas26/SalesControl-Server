@@ -252,6 +252,32 @@ module.exports = {
             res.status(401).json({ error: 'Insuficcient permissions' });
         }
     },
+    update: async function (req, res) {
+        if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
+            let { clientId, isPaid } = req.body;
+            let { id } = req.params;
+
+            if (clientId != null && isPaid != null) {
+                try {
+                    let sale = await Sales.findByPk(id);
+                    if (!sale) {
+                        res.status(404).json({ error: 'Sale not found' });
+                        return;
+                    }
+                    sale.clientId = clientId;
+                    sale.isPaid = isPaid;
+                    let updatedSale = await sale.save();
+                    res.status(200).json(updatedSale);
+                } catch (error) {
+                    res.status(400).json({ error });
+                }
+            } else {
+                res.status(400).json({ error: 'Empty fields' });
+            }
+        } else {
+            res.status(401).json({ error: 'Insuficcient permissions' });
+        }
+    },
     destroy: async function (req, res) {
         res.status(401).json({ error: 'No permitido' });
         /*
