@@ -54,7 +54,7 @@ module.exports = {
             res.queryObject = queryObject;
             next();
         } else {
-            res.status(401).json({ err: 'Insuficcient permissions' });
+            res.status(401).json({ error: 'Insuficcient permissions' });
         }
     },
     create: async function (req, res) {
@@ -70,7 +70,7 @@ module.exports = {
                 res.json({ error });
             }
         } else {
-            res.status(401).json({ err: 'Insuficcient permissions' });
+            res.status(401).json({ error: 'Insuficcient permissions' });
         }
     },
     update: async function (req, res) {
