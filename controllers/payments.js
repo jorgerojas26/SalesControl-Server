@@ -23,37 +23,45 @@ module.exports = {
                     switch (paymentMethodId) {
                         case 1:
                             if (paymentDetails.referenceCode && paymentDetails.bankId) {
-                                newPayment = await Payment.create(
-                                    {
-                                        saleId,
-                                        paymentMethodId,
-                                        amount,
-                                        currency,
-                                        banktransfer: {
-                                            referenceCode: paymentDetails.referenceCode,
-                                            bankId: paymentDetails.bankId,
+                                if (currency != 'Bs') {
+                                    throw 'Bank transfers must be in Bs currency';
+                                } else {
+                                    newPayment = await Payment.create(
+                                        {
+                                            saleId,
+                                            paymentMethodId,
+                                            amount,
+                                            currency,
+                                            banktransfer: {
+                                                referenceCode: paymentDetails.referenceCode,
+                                                bankId: paymentDetails.bankId,
+                                            },
                                         },
-                                    },
-                                    { include: 'banktransfer' },
-                                );
+                                        { include: 'banktransfer' },
+                                    );
+                                }
                             } else {
                                 throw 'Incorrect payment details';
                             }
                             break;
                         case 2:
                             if (paymentDetails.ticketId) {
-                                newPayment = await Payment.create(
-                                    {
-                                        saleId,
-                                        paymentMethodId,
-                                        amount,
-                                        currency,
-                                        pointofsale: {
-                                            ticketId: paymentDetails.ticketId,
+                                if (currency != 'Bs') {
+                                    throw 'Bank transfers must be in Bs currency';
+                                } else {
+                                    newPayment = await Payment.create(
+                                        {
+                                            saleId,
+                                            paymentMethodId,
+                                            amount,
+                                            currency,
+                                            pointofsale: {
+                                                ticketId: paymentDetails.ticketId,
+                                            },
                                         },
-                                    },
-                                    { include: 'pointofsale' },
-                                );
+                                        { include: 'pointofsale' },
+                                    );
+                                }
                             } else {
                                 throw 'Incorrect payment details';
                             }

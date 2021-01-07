@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const { roundUpProductPrice } = require('../helpers/products');
 module.exports = (sequelize, DataTypes) => {
     class payment extends Model {
         static associate(models) {
@@ -38,5 +39,33 @@ module.exports = (sequelize, DataTypes) => {
             modelName: 'payment',
         },
     );
+
+    payment.afterCreate(async (payment, options) => {
+        let saleId = payment.dataValues.saleId;
+        let sale = await sequelize.models.Sales.findByPk(saleId, {
+            include: ['saleProducts', 'payment'],
+        });
+
+        let invoiceTotal = 0,
+            paymentTotal = 0;
+
+        if (sale) {
+            sale.saleProducts.forEach(product => {
+                invoiceTotal += roundUpProductPrice(product.price * product.dolarReference);
+            });
+
+            sale.payment.forEach(payment => {
+                paymentTotal += payment.amount;
+            });
+
+            if (paymentTotal >= invoiceTotal && !sale.isPaid) {
+                sale.isPaid = true;
+                sale.save();
+            } else {
+                sale.isPaid = false;
+                sale.save();
+            }
+        }
+    });
     return payment;
 };
