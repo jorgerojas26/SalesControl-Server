@@ -43,20 +43,30 @@ module.exports = (sequelize, DataTypes) => {
     payment.afterCreate(async (payment, options) => {
         let saleId = payment.dataValues.saleId;
         let sale = await sequelize.models.Sales.findByPk(saleId, {
-            include: ['saleProducts', 'payment'],
+            include: [
+                {
+                    model: sequelize.models.SaleProducts,
+                    as: 'saleProducts',
+                    include: ['product'],
+                },
+                'payment',
+            ],
         });
+        let currentDolarReference = await sequelize.models.DolarReference.findOne({ order: [['id', 'DESC']], limit: 1 });
 
         let invoiceTotal = 0,
             paymentTotal = 0;
 
         if (sale) {
-            sale.saleProducts.forEach(product => {
-                invoiceTotal += roundUpProductPrice(product.price * product.dolarReference);
+            sale.saleProducts.forEach(saleProduct => {
+                invoiceTotal += roundUpProductPrice(saleProduct.product.price * currentDolarReference.price);
             });
 
             sale.payment.forEach(payment => {
                 paymentTotal += payment.amount;
             });
+
+            console.log(invoiceTotal);
 
             if (paymentTotal >= invoiceTotal && !sale.isPaid) {
                 sale.isPaid = true;

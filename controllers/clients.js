@@ -1,6 +1,6 @@
 const Clients = require('../models').Client;
 const Sales = require('../models').Sales;
-
+const SaleProducts = require('../models').SaleProducts;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -32,7 +32,14 @@ module.exports = {
                         where: {
                             isPaid: 0,
                         },
-                        include: ['saleProducts', 'payment'],
+                        include: [
+                            {
+                                model: SaleProducts,
+                                as: 'saleProducts',
+                                include: ['product'],
+                            },
+                            'payment',
+                        ],
                         separate: true,
                     },
                 ];
