@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
                 sourceKey: 'id',
                 onDelete: 'cascade',
             });
+
             Sales.hasMany(models.payment, {
                 as: 'payment',
                 foreignKey: 'saleId',

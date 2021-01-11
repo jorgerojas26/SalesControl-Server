@@ -164,15 +164,18 @@ module.exports = {
                                 { transaction: t },
                             );
                             for (product of products) {
-                                await sale.addProduct(product.id, {
-                                    through: {
+                                await sale.createSaleProduct(
+                                    {
+                                        productId: product.id,
                                         quantity: product.quantity,
                                         price: product.price,
                                         dolarReference: product.dolarReference,
                                         discount: product.discount,
                                     },
-                                    transaction: t,
-                                });
+                                    {
+                                        transaction: t,
+                                    },
+                                );
                             }
 
                             for (payment of payments) {
