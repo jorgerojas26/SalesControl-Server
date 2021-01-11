@@ -141,7 +141,7 @@ module.exports = {
 
             if (products && clientId && isPaid != null && payments) {
                 let allPaymentsActive = true;
-                for (payment of payments) {
+                for (let payment of payments) {
                     let paymentMethod = await PaymentMethod.findByPk(payment.paymentMethodId);
                     if (!paymentMethod) {
                         res.status(404).json({ error: 'Payment Method Not Found' });
@@ -178,70 +178,66 @@ module.exports = {
                                 );
                             }
 
-                            for (payment of payments) {
+                            for (let payment of payments) {
                                 if (payment.paymentMethodId && payment.amount && payment.currency && payment.paymentDetails) {
                                     let paymentDetails = payment.paymentDetails;
-                                    switch (payment.paymentMethodId) {
-                                        case 1:
-                                            if (paymentDetails.referenceCode && paymentDetails.bankId) {
-                                                if (payment.currency != 'Bs') {
-                                                    throw 'Bank transfers must be in Bs currency';
-                                                } else {
-                                                    await sale.createPayment(
-                                                        {
-                                                            ...payment,
-                                                            banktransfer: {
-                                                                referenceCode: paymentDetails.referenceCode,
-                                                                bankId: paymentDetails.bankId,
-                                                            },
+                                    if (payment.paymentMethodId == 1 || payment.paymentMethodId == '1') {
+                                        if (paymentDetails.referenceCode && paymentDetails.bankId) {
+                                            if (payment.currency != 'Bs') {
+                                                throw 'Bank transfers must be in Bs currency';
+                                            } else {
+                                                await sale.createPayment(
+                                                    {
+                                                        ...payment,
+                                                        banktransfer: {
+                                                            referenceCode: paymentDetails.referenceCode,
+                                                            bankId: paymentDetails.bankId,
                                                         },
-                                                        { transaction: t, include: 'banktransfer' },
-                                                    );
-                                                }
+                                                    },
+                                                    { transaction: t, include: 'banktransfer' },
+                                                );
+                                            }
+                                        } else {
+                                            throw 'Incorrect payment details';
+                                        }
+                                    } else if (payment.paymentMethodId == 2 || payment.paymentMethodId == '2') {
+                                        if (paymentDetails.ticketId) {
+                                            if (payment.currency != 'Bs') {
+                                                throw 'Bank transfers must be in Bs currency';
+                                            } else {
+                                                await sale.createPayment(
+                                                    {
+                                                        ...payment,
+                                                        pointofsale: {
+                                                            ticketId: paymentDetails.ticketId,
+                                                        },
+                                                    },
+                                                    { transaction: t, include: 'pointofsale' },
+                                                );
+                                            }
+                                        } else {
+                                            throw 'Incorrect payment details';
+                                        }
+                                    } else if (payment.paymentMethodId == 3 || payment.paymentMethodId == '3') {
+                                        if (payment.currency == 'Bs') {
+                                            await sale.createPayment(payment, { transaction: t });
+                                        } else if (payment.currency == 'USD') {
+                                            if (paymentDetails.dolarReference) {
+                                                await sale.createPayment(
+                                                    {
+                                                        ...payment,
+                                                        cash: {
+                                                            dolarReference: paymentDetails.dolarReference,
+                                                        },
+                                                    },
+                                                    { transaction: t, include: 'cash' },
+                                                );
                                             } else {
                                                 throw 'Incorrect payment details';
                                             }
-                                            break;
-                                        case 2:
-                                            if (paymentDetails.ticketId) {
-                                                if (payment.currency != 'Bs') {
-                                                    throw 'Bank transfers must be in Bs currency';
-                                                } else {
-                                                    await sale.createPayment(
-                                                        {
-                                                            ...payment,
-                                                            pointofsale: {
-                                                                ticketId: paymentDetails.ticketId,
-                                                            },
-                                                        },
-                                                        { transaction: t, include: 'pointofsale' },
-                                                    );
-                                                }
-                                            } else {
-                                                throw 'Incorrect payment details';
-                                            }
-                                            break;
-                                        case 3:
-                                            if (payment.currency == 'Bs') {
-                                                await sale.createPayment(payment, { transaction: t });
-                                            } else if (payment.currency == 'USD') {
-                                                if (paymentDetails.dolarReference) {
-                                                    await sale.createPayment(
-                                                        {
-                                                            ...payment,
-                                                            cash: {
-                                                                dolarReference: paymentDetails.dolarReference,
-                                                            },
-                                                        },
-                                                        { transaction: t, include: 'cash' },
-                                                    );
-                                                } else {
-                                                    throw 'Incorrect payment details';
-                                                }
-                                            } else {
-                                                throw 'Incorrect currency';
-                                            }
-                                            break;
+                                        } else {
+                                            throw 'Incorrect currency';
+                                        }
                                     }
                                 } else {
                                     throw 'Incorrect payment info';
