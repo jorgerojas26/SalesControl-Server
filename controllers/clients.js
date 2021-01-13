@@ -1,6 +1,10 @@
 const Clients = require('../models').Client;
 const Sales = require('../models').Sales;
 const SaleProducts = require('../models').SaleProducts;
+const Payment = require('../models').payment;
+const BankTransfer = require('../models').banktransfer;
+const Cash = require('../models').cash;
+const PointOfSale = require('../models').pointofsale;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -9,7 +13,7 @@ const moment = require('moment');
 module.exports = {
     index: async function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let { id, name, cedula, createdAt, updatedAt, from, to, withDebts } = req.query;
+            let { id, name, cedula, createdAt, updatedAt, from, to, withDebts, nameOrCedula } = req.query;
 
             let queryObject = {};
 
@@ -22,6 +26,18 @@ module.exports = {
             if (name) {
                 queryObject.where = {
                     name: { [Op.like]: `%${name}%` },
+                };
+            }
+            if (nameOrCedula) {
+                queryObject.where = {
+                    [Op.or]: [
+                        {
+                            name: { [Op.like]: `%${nameOrCedula}%` },
+                        },
+                        {
+                            cedula: { [Op.like]: `%${nameOrCedula}%` },
+                        },
+                    ],
                 };
             }
             if (withDebts) {
@@ -38,7 +54,11 @@ module.exports = {
                                 as: 'saleProducts',
                                 include: ['product'],
                             },
-                            'payment',
+                            {
+                                model: Payment,
+                                as: 'payment',
+                                include: { all: true },
+                            },
                         ],
                         separate: true,
                     },

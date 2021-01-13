@@ -39,6 +39,7 @@ const DebtRoutes = require('./routes/debt_routes');
 const PaymentMethodsRoutes = require('./routes/paymentMethods_routes');
 const BankRoutes = require('./routes/bank_routes');
 const PaymentsRoutes = require('./routes/payment_routes');
+const PointOfSaleRoutes = require('./routes/pointOfSales_routes');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,6 +60,7 @@ app.use(DebtRoutes);
 app.use(PaymentMethodsRoutes);
 app.use(BankRoutes);
 app.use(PaymentsRoutes);
+app.use(PointOfSaleRoutes);
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 

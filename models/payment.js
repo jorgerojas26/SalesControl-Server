@@ -49,7 +49,11 @@ module.exports = (sequelize, DataTypes) => {
                     as: 'saleProducts',
                     include: ['product'],
                 },
-                'payment',
+                {
+                    model: sequelize.models.payment,
+                    as: 'payment',
+                    include: { all: true },
+                },
             ],
         });
         let currentDolarReference = await sequelize.models.DolarReference.findOne({ order: [['id', 'DESC']], limit: 1 });
@@ -62,11 +66,21 @@ module.exports = (sequelize, DataTypes) => {
                 invoiceTotal += roundUpProductPrice(saleProduct.product.price * currentDolarReference.price);
             });
 
-            sale.payment.forEach(payment => {
-                paymentTotal += payment.amount;
-            });
+            sale.payment.forEach(pm => {
+                if (pm.currency == 'USD') {
+                    let dolarReference = 0;
+                    let paymentTypeArray = pm[pm.paymentmethod.name.toLowerCase().replace(/-/g, '')];
+                    paymentTypeArray.forEach(type => {
+                        if (type.paymentId == pm.id) {
+                            dolarReference = type.dolarReference;
+                        }
+                    });
 
-            console.log(invoiceTotal);
+                    paymentTotal += Math.round(pm.amount * dolarReference);
+                } else {
+                    paymentTotal += pm.amount;
+                }
+            });
 
             if (paymentTotal >= invoiceTotal && !sale.isPaid) {
                 sale.isPaid = true;
