@@ -24,22 +24,22 @@ module.exports = async function (req, res, next) {
             include: [
                 [
                     sequelize.literal(`(
-                        SELECT IFNULL(SUM(ROUND(supplying.quantity, 2)), 0) FROM supplyings as supplying
+                        SELECT IFNULL(SUM(ROUND(supplying.quantity, 3)), 0) FROM supplyings as supplying
                         WHERE supplying.productId = Product.id
                     )`),
                     'supplyingsTotal',
                 ],
                 [
                     sequelize.literal(`(
-                            SELECT IFNULL(SUM(ROUND(sales.quantity, 2)), 0) FROM saleproducts as sales
+                            SELECT IFNULL(SUM(ROUND(sales.quantity, 3)), 0) FROM saleproducts as sales
                             WHERE sales.productId = Product.id
                         )`),
                     'salesTotal',
                 ],
                 [
                     sequelize.literal(`(
-                        SELECT IFNULL(SUM(ROUND(supplying.quantity, 2)), 0) FROM supplyings as supplying
-                        WHERE supplying.productId = Product.id) - (SELECT IFNULL(SUM(ROUND(sales.quantity, 2)), 0) FROM saleproducts as sales
+                        SELECT IFNULL(SUM(ROUND(supplying.quantity, 3)), 0) FROM supplyings as supplying
+                        WHERE supplying.productId = Product.id) - (SELECT IFNULL(SUM(ROUND(sales.quantity, 3)), 0) FROM saleproducts as sales
                         WHERE sales.productId = Product.id)`),
                     'stock',
                 ],
