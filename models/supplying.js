@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   Supplying.init({
     supplierId: DataTypes.INTEGER,
     productId: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER,
+    quantity: DataTypes.FLOAT,
     price: DataTypes.FLOAT,
     dolarReference: DataTypes.FLOAT
   }, {

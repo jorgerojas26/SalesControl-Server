@@ -5,16 +5,16 @@ const sequelize = require("sequelize")
 const Op = sequelize.Op;
 module.exports = async function (req, res, next) {
     if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-        let { id, name } = req.query;
+        let {id, name} = req.query;
 
         let queryObject = {};
         queryObject.include = [
             "discount"
         ]
         if (name) queryObject.where = {
-            name: { [Op.like]: `%${name}%` }
+            name: {[Op.like]: `%${name}%`}
         };
-        if (id) queryObject.where = { id };
+        if (id) queryObject.where = {id};
 
         if (req.params.productId) {
             queryObject.where = {
@@ -25,21 +25,21 @@ module.exports = async function (req, res, next) {
             include: [
                 [
                     sequelize.literal(`(
-                        SELECT IFNULL(SUM(supplying.quantity), 0) FROM supplyings as supplying
+                        SELECT IFNULL(SUM(ROUND(supplying.quantity, 3)), 0) FROM supplyings as supplying
                         WHERE supplying.productId = Product.id
                     )`),
                     "supplyingsTotal"
                 ],
                 [
                     sequelize.literal(`(
-                            SELECT IFNULL(SUM(sales.quantity), 0) FROM saleproducts as sales
+                            SELECT IFNULL(SUM(ROUND(sales.quantity, 3)), 0) FROM saleproducts as sales
                             WHERE sales.productId = Product.id
                         )`),
                     "salesTotal"
                 ],
                 [sequelize.literal(`(
-                        SELECT IFNULL(SUM(supplying.quantity), 0) FROM supplyings as supplying
-                        WHERE supplying.productId = Product.id) - (SELECT IFNULL(SUM(sales.quantity), 0) FROM saleproducts as sales
+                        SELECT IFNULL(SUM(ROUND(supplying.quantity, 3)), 0) FROM supplyings as supplying
+                        WHERE supplying.productId = Product.id) - (SELECT IFNULL(SUM(ROUND(sales.quantity,3 )), 0) FROM saleproducts as sales
                         WHERE sales.productId = Product.id)`),
                     "stock"
                 ]
@@ -50,7 +50,7 @@ module.exports = async function (req, res, next) {
         next();
     }
     else {
-        res.status(401).send({ err: "Insufficient permissions" });
+        res.status(401).send({err: "Insufficient permissions"});
     }
 
 

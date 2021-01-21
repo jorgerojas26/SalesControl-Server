@@ -1,25 +1,46 @@
 const Payment = require('../models').payment;
 const sequelizeModel = require('../models').sequelize;
 
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
 module.exports = {
     index: async function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
+            let queryObject = {};
+
+            let {from, to} = req.query;
+
+            queryObject.include = ["paymentmethod"]
+
+            if (from && to) {
+                queryObject.where = Sequelize.literal(`DATE(payment.createdAt) BETWEEN "${from}" AND "${to}"`);
+                queryObject.attributes = {
+                    include: [
+                        [Sequelize.literal("SUM(ROUND(payment.amount, 2))"), "amountTotal"]
+                    ]
+                }
+                queryObject.group = ["payment.paymentMethodId", "payment.currency"]
+            }
+
+            res.queryObject = queryObject;
+
             next();
         } else {
-            res.status(401).json({ error: 'Insuficcient permissions' });
+            res.status(401).json({error: 'Insuficcient permissions'});
         }
     },
     create: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let { saleId, paymentMethodId, amount, currency, paymentDetails } = req.body;
+            let {saleId, paymentMethodId, amount, currency, paymentDetails} = req.body;
 
             if (saleId && paymentMethodId && amount != null && currency && paymentDetails) {
                 if (amount == 0) {
-                    res.status(400).json({ error: "Can't record a payment with amount 0" });
+                    res.status(400).json({error: "Can't record a payment with amount 0"});
                     return;
                 }
                 if (currency != 'Bs' && currency != 'USD') {
-                    res.status(400).json({ error: 'Invalid currency' });
+                    res.status(400).json({error: 'Invalid currency'});
                     return;
                 }
                 try {
@@ -40,7 +61,7 @@ module.exports = {
                                             bankId: paymentDetails.bankId,
                                         },
                                     },
-                                    { include: 'banktransfer' },
+                                    {include: 'banktransfer'},
                                 );
                             }
                         } else {
@@ -61,7 +82,7 @@ module.exports = {
                                             ticketId: paymentDetails.ticketId,
                                         },
                                     },
-                                    { include: 'pointofsale' },
+                                    {include: 'pointofsale'},
                                 );
                             }
                         } else {
@@ -87,7 +108,7 @@ module.exports = {
                                             dolarReference: paymentDetails.dolarReference,
                                         },
                                     },
-                                    { include: 'cash' },
+                                    {include: 'cash'},
                                 );
                             } else {
                                 throw 'Incorrect payment details';
@@ -100,13 +121,13 @@ module.exports = {
                     }
                     res.status(200).json(newPayment);
                 } catch (error) {
-                    res.status(404).json({ error });
+                    res.status(404).json({error});
                 }
             } else {
-                res.status(400).json({ error: 'Empty fields' });
+                res.status(400).json({error: 'Empty fields'});
             }
         } else {
-            res.status(401).json({ error: 'Insuficcient permissions' });
+            res.status(401).json({error: 'Insuficcient permissions'});
         }
     },
     update: async function (req, res) {},
