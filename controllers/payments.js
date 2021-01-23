@@ -1,5 +1,4 @@
 const Payment = require('../models').payment;
-const sequelizeModel = require('../models').sequelize;
 
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
@@ -9,18 +8,39 @@ module.exports = {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let queryObject = {};
 
-            let {from, to} = req.query;
+            let {from, to, createdAt, operation, group} = req.query;
 
             queryObject.include = ["paymentmethod"]
 
-            if (from && to) {
-                queryObject.where = Sequelize.literal(`DATE(payment.createdAt) BETWEEN "${from}" AND "${to}"`);
+            if (createdAt && operation) {
+                if (operation == 'gte') {
+                    queryObject.where = {
+                        createdAt: {
+                            [Op.gte]: createdAt,
+                        },
+                    };
+                } else if (operation == 'lte') {
+                    queryObject.where = {
+                        createdAt: Sequelize.literal(`DATE(payment.createdAt) <= "${createdAt}"`),
+                    };
+                } else if (operation == 'eq') {
+                    queryObject.where = {
+                        createdAt: Sequelize.literal(`DATE(payment.createdAt) = "${createdAt}"`),
+                    };
+                }
+            }
+
+            if (group) {
+                queryObject.group = ["payment.paymentMethodId", "payment.currency"]
                 queryObject.attributes = {
                     include: [
-                        [Sequelize.literal("SUM(ROUND(payment.amount, 2))"), "amountTotal"]
-                    ]
+                        [Sequelize.literal("SUM(payment.amount)"), "amountTotal"]
+                    ],
                 }
-                queryObject.group = ["payment.paymentMethodId", "payment.currency"]
+            }
+
+            if (from && to) {
+                queryObject.where = Sequelize.literal(`DATE(payment.createdAt) BETWEEN "${from}" AND "${to}"`);
             }
 
             res.queryObject = queryObject;
