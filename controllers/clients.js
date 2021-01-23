@@ -13,7 +13,7 @@ const moment = require('moment');
 module.exports = {
     index: async function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let { id, name, cedula, createdAt, updatedAt, from, to, withDebts, nameOrCedula } = req.query;
+            let {id, name, cedula, createdAt, updatedAt, from, to, withDebts, nameOrCedula} = req.query;
 
             let queryObject = {};
 
@@ -25,17 +25,17 @@ module.exports = {
 
             if (name) {
                 queryObject.where = {
-                    name: { [Op.like]: `%${name}%` },
+                    name: {[Op.like]: `%${name}%`},
                 };
             }
             if (nameOrCedula) {
                 queryObject.where = {
                     [Op.or]: [
                         {
-                            name: { [Op.like]: `%${nameOrCedula}%` },
+                            name: {[Op.like]: `%${nameOrCedula}%`},
                         },
                         {
-                            cedula: { [Op.like]: `%${nameOrCedula}%` },
+                            cedula: {[Op.like]: `%${nameOrCedula}%`},
                         },
                     ],
                 };
@@ -57,7 +57,7 @@ module.exports = {
                             {
                                 model: Payment,
                                 as: 'payment',
-                                include: { all: true },
+                                include: {all: true},
                             },
                         ],
                         separate: true,
@@ -67,7 +67,7 @@ module.exports = {
 
             if (cedula) {
                 queryObject.where = {
-                    cedula: { [Op.like]: `${cedula}%` },
+                    cedula: {[Op.like]: `${cedula}%`},
                 };
             }
 
@@ -94,7 +94,7 @@ module.exports = {
             res.queryObject = queryObject;
             next();
         } else {
-            res.status(401).json({ err: 'Insuficcient permissions' });
+            res.status(401).json({err: 'Insuficcient permissions'});
         }
     },
     create: async function (req, res) {
@@ -107,16 +107,22 @@ module.exports = {
                 });
                 res.status(200).json(client);
             } catch (error) {
-                res.json({ error });
+
+                if (error.errors && error.errors[0].message) {
+                    res.json({error: error.errors[0].message})
+                }
+                else {
+                    res.json({error});
+                }
             }
         } else {
-            res.status(401).json({ err: 'Insuficcient permissions' });
+            res.status(401).json({err: 'Insuficcient permissions'});
         }
     },
     update: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let { id } = req.params;
-            let { name, cedula, phoneNumber } = req.body;
+            let {id} = req.params;
+            let {name, cedula, phoneNumber} = req.body;
 
             if (name != null && cedula != null && phoneNumber != null) {
                 let client = await Clients.update(
@@ -125,14 +131,14 @@ module.exports = {
                         cedula,
                         phoneNumber,
                     },
-                    { where: { id } },
+                    {where: {id}},
                 );
                 res.status(200).json(client);
             } else {
-                res.status(409).json({ error: 'No data provided' });
+                res.status(409).json({error: 'No data provided'});
             }
         } else {
-            res.status(401).json({ error: 'Insufficient permissions' });
+            res.status(401).json({error: 'Insufficient permissions'});
         }
     },
     show: function (req, res) {},

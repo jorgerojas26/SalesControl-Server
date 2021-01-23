@@ -11,7 +11,7 @@ const moment = require('moment');
 module.exports = {
     index: function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let {productName, productId, id, createdAt, updatedAt, from, to, operation, group} = req.query;
+            let {productName, productId, id, createdAt, updatedAt, from, to, operation, group, debtsOnly} = req.query;
             let queryObject = {};
 
             res.Model = Sales;
@@ -128,6 +128,19 @@ module.exports = {
 
             if (from && to) {
                 queryObject.where = Sequelize.literal(`DATE(SaleProducts.createdAt) BETWEEN "${from}" AND "${to}"`);
+            }
+
+            if (debtsOnly) {
+                queryObject.where = {
+                    isPaid: 0
+                }
+                queryObject.include = ["client", "payment", {
+                    model: SaleProducts,
+                    as: "saleProducts",
+                    include: ["product"]
+
+                }]
+
             }
             res.queryObject = queryObject;
             next();
