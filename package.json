@@ -25,7 +25,8 @@
     "pug": "^3.0.0",
     "react-content-loader": "^5.1.1",
     "react-infinite-scroll-component": "^5.0.5",
-    "sequelize": "^6.3.4",
+    "sequelize": "^6.5.0",
+    "sequelize-cli": "^6.2.0",
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {

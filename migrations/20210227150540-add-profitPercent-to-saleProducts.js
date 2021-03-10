@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("saleProducts", "profitPercent", {
+    await queryInterface.addColumn("saleproducts", "profitPercent", {
       type: Sequelize.FLOAT,
       allowNull: false,
       after: "dolarReference"
@@ -12,6 +12,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn("saleProducts", "profitPercent");
+    await queryInterface.removeColumn("saleproducts", "profitPercent");
   }
 };
