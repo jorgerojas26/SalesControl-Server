@@ -22,7 +22,7 @@ var storage = multer.diskStorage({
     },
 });
 
-var upload = multer({storage});
+var upload = multer({ storage });
 const productRoutes = require('./routes/product_routes');
 const categoryRoutes = require('./routes/category_routes');
 const supplyingsRoutes = require('./routes/supplying_routes');
@@ -40,9 +40,10 @@ const PaymentMethodsRoutes = require('./routes/paymentMethods_routes');
 const BankRoutes = require('./routes/bank_routes');
 const PaymentsRoutes = require('./routes/payment_routes');
 const PointOfSaleRoutes = require('./routes/pointOfSales_routes');
+const ReportRoutes = require("./routes/report_routes");
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(upload.single('productImageFile'), productRoutes);
 app.use(categoryRoutes);
@@ -61,6 +62,7 @@ app.use(PaymentMethodsRoutes);
 app.use(BankRoutes);
 app.use(PaymentsRoutes);
 app.use(PointOfSaleRoutes);
+app.use(ReportRoutes);
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 

@@ -1,5 +1,5 @@
 'use strict';
-const {Model} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Sales extends Model {
         static associate(models) {
@@ -20,19 +20,22 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'payment',
                 foreignKey: 'saleId',
                 sourceKey: 'id',
+                onDelete: "cascade"
             });
 
             Sales.belongsTo(models.Client, {
                 as: "client",
                 foreignKey: "clientId",
                 sourceKey: "id"
-            })
+            });
         }
     }
     Sales.init(
         {
             clientId: DataTypes.INTEGER,
             isPaid: DataTypes.BOOLEAN,
+            fullyPaidDate: DataTypes.DATE,
+            dolarReference: DataTypes.FLOAT
         },
         {
             sequelize,

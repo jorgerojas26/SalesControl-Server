@@ -15,6 +15,7 @@ module.exports = {
                     model: 'payments',
                     key: 'id',
                 },
+                onDelete: "cascade"
             },
             referenceCode: {
                 type: Sequelize.INTEGER,

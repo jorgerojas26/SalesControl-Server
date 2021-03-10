@@ -14,14 +14,14 @@ module.exports = {
         queryObject.include = [
             "supplier",
             "product"
-        ]
-        queryObject.order = [["createdAt", "DESC"]]
+        ];
+        queryObject.order = [["createdAt", "DESC"]];
 
 
         if (id) {
             queryObject.where = {
                 id
-            }
+            };
         }
         if (supplierId) {
             queryObject.include = [
@@ -36,7 +36,7 @@ module.exports = {
                     model: Product,
                     as: "product"
                 }
-            ]
+            ];
         }
         if (supplierName) {
             queryObject.include = [
@@ -51,7 +51,7 @@ module.exports = {
                     model: Product,
                     as: "product"
                 }
-            ]
+            ];
         }
         if (productId) {
             queryObject.include = [
@@ -67,7 +67,7 @@ module.exports = {
                         id: productId
                     }
                 }
-            ]
+            ];
         }
         if (productName) {
             queryObject.include = [
@@ -83,17 +83,17 @@ module.exports = {
                         name: { [Op.like]: `%${productName}%` }
                     }
                 }
-            ]
+            ];
         }
         if (price) {
             queryObject.where = {
                 price
-            }
+            };
         }
         if (quantity) {
             queryObject.where = {
                 quantity
-            }
+            };
         }
 
         if (createdAt) {
@@ -103,7 +103,7 @@ module.exports = {
                     [Op.lte]: moment(createdAt).add(1, "days").format("YYYY-MM-DD HH:mm:ss")
 
                 }
-            }
+            };
         }
         if (createdAt && operation) {
             if (operation == "gte") {
@@ -111,12 +111,12 @@ module.exports = {
                     createdAt: {
                         [Op.gte]: createdAt
                     }
-                }
+                };
             }
             else if (operation == "lte") {
                 queryObject.where = {
                     createdAt: Sequelize.literal(`DATE(Supplying.createdAt) <= "${createdAt}"`)
-                }
+                };
             }
         }
 
@@ -126,7 +126,7 @@ module.exports = {
                     [Op.gte]: moment(updatedAt).format("YYYY-MM-DD HH:mm:ss"),
                     [Op.lte]: moment(updatedAt).add(1, "days").format("YYYY-MM-DD HH:mm:ss")
                 }
-            }
+            };
         }
         if (from && to) {
             queryObject.where = Sequelize.literal(`DATE(Supplying.createdAt) BETWEEN "${from}" AND "${to}"`);
@@ -136,12 +136,13 @@ module.exports = {
             queryObject.attributes = {
                 include: [
                     [Sequelize.fn("SUM", Sequelize.col("quantity")), "quantity"],
-                    [Sequelize.literal("SUM(`Supplying`.`price` * `Supplying`.`quantity`)"), "grossTotalDollars"]
+                    [Sequelize.literal("SUM(`Supplying`.`price` * `Supplying`.`quantity`)"), "grossTotalDollars"],
+                    [Sequelize.literal("SUM(`Supplying`.`price` * `Supplying`.`quantity`) * Supplying.dolarReference"), "grossTotalBs"]
 
                 ],
                 exclude: ["quantity"]
-            }
-            queryObject.group = ["product.id"]
+            };
+            queryObject.group = ["product.id"];
         }
         res.queryObject = queryObject;
         next();
@@ -164,11 +165,11 @@ module.exports = {
     destroy: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let { id } = req.params;
-            await Supplying.destroy({ where: { id } })
+            await Supplying.destroy({ where: { id } });
             res.sendStatus(204);
         }
         else {
-            res.status(401).json({ err: "Insufficient permissions" })
+            res.status(401).json({ err: "Insufficient permissions" });
         }
     }
-}
+};

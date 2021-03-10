@@ -1,6 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
 const { roundUpProductPrice } = require('../helpers/products');
+const { calculateSaleTotal, calculatePaymentsTotal } = require("../helpers/sales");
 module.exports = (sequelize, DataTypes) => {
     class payment extends Model {
         static associate(models) {
@@ -13,17 +14,20 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'pointofsale',
                 foreignKey: 'paymentId',
                 sourceKey: 'id',
+                onDelete: "CASCADE"
             });
             payment.hasMany(models.banktransfer, {
                 as: 'banktransfer',
                 foreignKey: 'paymentId',
                 sourceKey: 'id',
+                onDelete: "CASCADE"
             });
 
             payment.hasMany(models.cash, {
                 as: 'cash',
                 foreignKey: 'paymentId',
                 sourceKey: 'id',
+                onDelete: "CASCADE"
             });
         }
     }
@@ -40,7 +44,9 @@ module.exports = (sequelize, DataTypes) => {
         },
     );
 
-    payment.afterCreate(async (payment, options) => {
+    payment.beforeCreate(async (payment, options) => {
+        console.log("fullyPAIDDDDDDDDDDDDDDDD", options.fullyPaid);
+        console.log(options);
         let saleId = payment.dataValues.saleId;
         let sale = await sequelize.models.Sales.findByPk(saleId, {
             include: [
@@ -56,39 +62,10 @@ module.exports = (sequelize, DataTypes) => {
                 },
             ],
         });
-        let currentDolarReference = await sequelize.models.DolarReference.findOne({ order: [['id', 'DESC']], limit: 1 });
-
-        let invoiceTotal = 0,
-            paymentTotal = 0;
-
-        if (sale) {
-            sale.saleProducts.forEach(saleProduct => {
-                invoiceTotal += roundUpProductPrice(saleProduct.product.price * currentDolarReference.price);
-            });
-
-            sale.payment.forEach(pm => {
-                if (pm.currency == 'USD') {
-                    let dolarReference = 0;
-                    let paymentTypeArray = pm[pm.paymentmethod.name.toLowerCase().replace(/-/g, '')];
-                    paymentTypeArray.forEach(type => {
-                        if (type.paymentId == pm.id) {
-                            dolarReference = type.dolarReference;
-                        }
-                    });
-
-                    paymentTotal += Math.round(pm.amount * dolarReference);
-                } else {
-                    paymentTotal += pm.amount;
-                }
-            });
-
-            if (paymentTotal >= invoiceTotal && !sale.isPaid) {
-                sale.isPaid = true;
-                sale.save();
-            } else {
-                sale.isPaid = false;
-                sale.save();
-            }
+        if (options.fullyPaid == 1) {
+            sale.isPaid = true;
+            sale.fullyPaidDate = new Date();
+            sale.save();
         }
     });
     return payment;

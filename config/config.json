@@ -4,9 +4,9 @@
     "password": null,
     "database": "supermercado-melquisedec",
     "host": "127.0.0.1",
+    "logging": true,
     "dialect": "mysql",
     "dialectOptions": {
-      "useUTC": false,
       "dateStrings": true,
       "timezone": "-04:00"
     },
@@ -24,6 +24,7 @@
     "password": "Jj20Rr3$",
     "database": "supermercado-melquisedec",
     "host": "103.195.100.3",
+    "logging": true,
     "dialect": "mysql",
     "dialectOptions": {
       "useUTC": false,

@@ -15,6 +15,7 @@ module.exports = {
                     model: 'sales',
                     key: 'id',
                 },
+                onDelete: "cascade"
             },
             paymentMethodId: {
                 type: Sequelize.INTEGER,

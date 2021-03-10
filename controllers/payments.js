@@ -8,9 +8,9 @@ module.exports = {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let queryObject = {};
 
-            let {from, to, createdAt, operation, group} = req.query;
+            let { from, to, createdAt, operation, group } = req.query;
 
-            queryObject.include = ["paymentmethod"]
+            queryObject.include = ["paymentmethod"];
 
             if (createdAt && operation) {
                 if (operation == 'gte') {
@@ -31,12 +31,12 @@ module.exports = {
             }
 
             if (group) {
-                queryObject.group = ["payment.paymentMethodId", "payment.currency"]
+                queryObject.group = ["payment.paymentMethodId", "payment.currency"];
                 queryObject.attributes = {
                     include: [
                         [Sequelize.literal("SUM(payment.amount)"), "amountTotal"]
                     ],
-                }
+                };
             }
 
             if (from && to) {
@@ -47,25 +47,25 @@ module.exports = {
 
             next();
         } else {
-            res.status(401).json({error: 'Insuficcient permissions'});
+            res.status(401).json({ error: 'Insuficcient permissions' });
         }
     },
     create: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let {saleId, paymentMethodId, amount, currency, paymentDetails} = req.body;
+            let { saleId, paymentMethodId, amount, currency, paymentDetails, fullyPaid } = req.body;
 
-            if (saleId && paymentMethodId && amount != null && currency && paymentDetails) {
+            if (saleId != null && paymentMethodId != null && amount != null && currency != null && paymentDetails) {
                 if (amount == 0) {
-                    res.status(400).json({error: "Can't record a payment with amount 0"});
+                    res.status(400).json({ error: "Can't record a payment with amount 0" });
                     return;
                 }
                 if (currency != 'Bs' && currency != 'USD') {
-                    res.status(400).json({error: 'Invalid currency'});
+                    res.status(400).json({ error: 'Invalid currency' });
                     return;
                 }
                 try {
                     let newPayment = null;
-                    if (paymentMethodId == 1) {
+                    if (paymentMethodId == 3) {
                         if (paymentDetails.referenceCode && paymentDetails.bankId) {
                             if (currency != 'Bs') {
                                 throw 'Bank transfers must be in Bs currency';
@@ -81,13 +81,13 @@ module.exports = {
                                             bankId: paymentDetails.bankId,
                                         },
                                     },
-                                    {include: 'banktransfer'},
+                                    { include: 'banktransfer', fullyPaid },
                                 );
                             }
                         } else {
                             throw 'Incorrect payment details';
                         }
-                    } else if (paymentMethodId == 2) {
+                    } else if (paymentMethodId == 1) {
                         if (paymentDetails.ticketId) {
                             if (currency != 'Bs') {
                                 throw 'Bank transfers must be in Bs currency';
@@ -102,20 +102,20 @@ module.exports = {
                                             ticketId: paymentDetails.ticketId,
                                         },
                                     },
-                                    {include: 'pointofsale'},
+                                    { include: 'pointofsale', fullyPaid },
                                 );
                             }
                         } else {
                             throw 'Incorrect payment details';
                         }
-                    } else if (paymentMethodId == 3) {
+                    } else if (paymentMethodId == 2) {
                         if (currency == 'Bs') {
                             newPayment = await Payment.create({
                                 saleId,
                                 paymentMethodId,
                                 amount,
                                 currency,
-                            });
+                            }, { fullyPaid });
                         } else if (currency == 'USD') {
                             if (paymentDetails.dolarReference) {
                                 newPayment = await Payment.create(
@@ -128,7 +128,7 @@ module.exports = {
                                             dolarReference: paymentDetails.dolarReference,
                                         },
                                     },
-                                    {include: 'cash'},
+                                    { include: 'cash', fullyPaid },
                                 );
                             } else {
                                 throw 'Incorrect payment details';
@@ -141,15 +141,15 @@ module.exports = {
                     }
                     res.status(200).json(newPayment);
                 } catch (error) {
-                    res.status(404).json({error});
+                    res.status(404).json({ error });
                 }
             } else {
-                res.status(400).json({error: 'Empty fields'});
+                res.status(400).json({ error: 'Empty fields' });
             }
         } else {
-            res.status(401).json({error: 'Insuficcient permissions'});
+            res.status(401).json({ error: 'Insuficcient permissions' });
         }
     },
-    update: async function (req, res) {},
-    delete: async function (req, req) {},
+    update: async function (req, res) { },
+    delete: async function (req, req) { },
 };

@@ -11,7 +11,7 @@ const isAuthenticated = require('../middlewares/isAuthenticated');
 
 router.route('/api/sales').get(isAuthenticated, SalesController.index, paginatedRequest(Product)).post(isAuthenticated, checkInventory, SalesController.create);
 
-router.route('/api/sales/:id').delete(isAuthenticated, SalesController.destroy).put(isAuthenticated, SalesController.update);
+router.route('/api/sales/:id').delete(isAuthenticated, SalesController.destroy).patch(isAuthenticated, SalesController.update);
 
 module.exports = router;
 
