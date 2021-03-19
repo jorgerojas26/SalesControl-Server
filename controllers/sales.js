@@ -2,6 +2,7 @@ const Sales = require('../models').Sales;
 const SaleProducts = require('../models').SaleProducts;
 const Product = require('../models').Product;
 const Payment = require("../models").payment;
+const Client = require('../models').Client;
 const PaymentMethod = require('../models').paymentmethod;
 const sequelizeModel = require('../models').sequelize;
 const Sequelize = require('sequelize');
@@ -12,7 +13,7 @@ const moment = require('moment');
 module.exports = {
     index: function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let { productName, productId, id, createdAt, updatedAt, from, to, operation, group, debtsOnly } = req.query;
+            let { productName, productId, id, createdAt, updatedAt, from, to, operation, group, debtsOnly, clientName } = req.query;
             let queryObject = {};
 
             res.Model = Sales;
@@ -34,11 +35,18 @@ module.exports = {
                     as: "payment",
                     include: ["paymentmethod", "pointofsale", "cash", "banktransfer"]
                 },
-                "client"
+                {
+                    model: Client,
+                    as: "client",
+                    where: {
+                        name: { [Op.like]: `%${clientName || ""}%` }
+                    }
+
+                }
             ];
             queryObject.order = [['createdAt', 'DESC']];
 
-            if (productName)
+            if (productName) {
                 queryObject.include = {
                     model: SaleProducts,
                     as: 'saleProducts',
@@ -55,6 +63,7 @@ module.exports = {
                         },
                     },
                 };
+            }
 
             if (productId)
                 queryObject.include = {

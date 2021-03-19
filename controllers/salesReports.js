@@ -5,6 +5,8 @@ const Product = require("../models").Product;
 const Sequelize = require("sequelize");
 const sequelizeModel = require("../models").sequelize;
 
+const helpers = require("../helpers/products");
+
 module.exports = {
     index: async function (req, res) {
         let { startDate, endDate } = req.query;
@@ -24,13 +26,17 @@ module.exports = {
                 products.id as productId,
                 products.name as productName,
                 saleproducts.price,
-                saleproducts.quantity,
+                CASE
+                WHEN saleproducts.price * sales.dolarReference < 10000
+                THEN CEIL(saleproducts.price * sales.dolarReference / 100) * 100
+                ELSE CEIL(saleproducts.price * sales.dolarReference / 1000) * 1000 END AS priceBs,
+                ROUND(saleproducts.quantity, 3) as quantity,
                 saleproducts.profitPercent,
                 sales.dolarReference,
                 ROUND(saleproducts.price * quantity, 2) as grossIncome,
                 ROUND(saleproducts.price * quantity * (saleproducts.profitPercent / 100), 2) as netIncome,
-                ROUND(saleproducts.price * quantity * sales.dolarReference) as grossIncomeBs,
-                ROUND(saleproducts.price * quantity * (saleproducts.profitPercent / 100), 2) * sales.dolarReference as netIncomeBs
+                ROUND(((select priceBs) * quantity)) as grossIncomeBs,
+                ROUND(((select priceBs) * quantity) * (saleproducts.profitPercent / 100)) as netIncomeBs
                 FROM saleproducts
                 INNER JOIN products ON saleproducts.productId = products.id
                 INNER JOIN sales ON sales.id = saleproducts.saleId
@@ -58,6 +64,7 @@ module.exports = {
         WHERE DATE(saleproducts.createdAt) BETWEEN DATE(:startDate) AND DATE(:endDate) 
         `, { replacements: { startDate, endDate }, type: Sequelize.QueryTypes.SELECT });
         */
+            console.log(response);
             res.send(response);
         }
     },
