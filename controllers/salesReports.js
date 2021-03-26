@@ -1,4 +1,5 @@
 const Sales = require("../models").Sales;
+const Payment = require("../models").payment;
 const Client = require("../models").Client;
 const SaleProducts = require("../models").SaleProducts;
 const Product = require("../models").Product;
@@ -30,7 +31,7 @@ module.exports = {
                 WHEN saleproducts.price * sales.dolarReference < 10000
                 THEN CEIL(saleproducts.price * sales.dolarReference / 100) * 100
                 ELSE CEIL(saleproducts.price * sales.dolarReference / 1000) * 1000 END AS priceBs,
-                ROUND(saleproducts.quantity, 3) as quantity,
+                saleproducts.quantity,
                 saleproducts.profitPercent,
                 sales.dolarReference,
                 ROUND(saleproducts.price * quantity, 2) as grossIncome,
@@ -64,23 +65,31 @@ module.exports = {
         WHERE DATE(saleproducts.createdAt) BETWEEN DATE(:startDate) AND DATE(:endDate) 
         `, { replacements: { startDate, endDate }, type: Sequelize.QueryTypes.SELECT });
         */
-            console.log(response);
             res.send(response);
         }
     },
     payments: async function (req, res) {
         let { startDate, endDate } = req.query;
-
         let response = await sequelizeModel.query(`
         SELECT
-        paymentmethods.id,
-        paymentmethods.name as paymentMethodName,
+        payments.paymentMethodId,
+        payments.paymentMethodName,
         SUM(payments.amount) as amount,
-        payments.currency
+        payments.currency,
+        ROUND(SUM(payments.cashToBs)) as cashToBs
+        FROM
+        (
+        SELECT
+        paymentmethods.id as paymentMethodId,
+        paymentmethods.name as paymentMethodName,
+        payments.amount as amount,
+        payments.currency as currency,
+        CASE WHEN payments.paymentMEthodId = 2 THEN payments.amount * cash.dolarReference END AS cashToBs
         FROM payments
         LEFT JOIN cash ON cash.paymentId = payments.id
         INNER JOIN paymentmethods ON paymentmethods.id = payments.paymentMethodId 
         WHERE DATE(payments.createdAt) BETWEEN DATE(:startDate) AND DATE(:endDate) 
+        ) payments
         group by payments.paymentMethodId, payments.currency
         `, { replacements: { startDate, endDate }, type: Sequelize.QueryTypes.SELECT });
         res.send(response);
@@ -111,7 +120,13 @@ module.exports = {
                         }
                     }]
                 },
-                "payment"
+                {
+                    model: Payment,
+                    as: "payment",
+                    where: Sequelize.where(Sequelize.fn("DATE", Sequelize.col("payment.createdAt")), { [Sequelize.Op.between]: [startDate, endDate] }),
+                    required: false,
+                    include: { all: true },
+                }
             ],
             where: {
                 [Sequelize.Op.and]: [
