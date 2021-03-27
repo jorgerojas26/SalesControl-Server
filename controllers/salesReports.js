@@ -44,7 +44,6 @@ module.exports = {
                 WHERE DATE(saleproducts.createdAt) BETWEEN DATE(:startDate) AND DATE(:endDate)
                 ) a
                 group by a.productId
-
             `, { replacements: { startDate, endDate }, type: Sequelize.QueryTypes.SELECT });
             /*
             let response = await sequelizeModel.query(`
@@ -70,24 +69,71 @@ module.exports = {
     },
     payments: async function (req, res) {
         let { startDate, endDate } = req.query;
+        /*
+SELECT 
+payments.id,
+payments.saleId,
+payments.paymentMethodId,
+SUM(payments.amount) as amountPaid,
+CASE WHEN payments.paymentMethodId = 2 THEN payments.amount * cash.dolarReference END AS cashToBs,
+payments.currency,
+cash.dolarReference,
+(
+SELECT
+CASE
+WHEN saleproducts.price * sales.dolarReference < 10000
+THEN SUM(CEIL(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 100) * 100)
+ELSE SUM(CEIL(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 1000) * 1000) END AS priceBs
+FROM saleproducts
+WHERE saleproducts.saleId = sales.id
+group by saleproducts.saleId
+) as invoiceTotal,
+CASE
+WHEN payments.paymentMethodId = 2 AND (select cashToBs) < (select invoiceTotal) THEN (select invoiceTotal) - (select cashToBs)
+WHEN payments.paymentMethodId = 2 AND (select cashToBs) > (select invoiceTotal) THEN (select cashToBs) - (select invoiceTotal)
+WHEN payments.paymentMethodId != 2 AND payments.amount < (select invoiceTotal) THEN (select invoiceTotal) - payments.amount
+WHEN payments.paymentMethodId != 2 AND payments.amount > (select invoiceTotal) THEN payments.amount - (select invoiceTotal) END AS remaining
+FROM payments
+LEFT JOIN cash ON cash.paymentId = payments.id
+INNER JOIN sales ON sales.id = payments.saleId
+WHERE DATE(payments.createdAt) BETWEEN "2021-03-15" AND "2021-03-15"
+group by payments.saleId
+         */
         let response = await sequelizeModel.query(`
         SELECT
         payments.paymentMethodId,
         payments.paymentMethodName,
         SUM(payments.amount) as amount,
         payments.currency,
-        ROUND(SUM(payments.cashToBs)) as cashToBs
+        ROUND(SUM(payments.cashToBs)) as cashToBs,
+        SUM(payments.remaining) as remaining
         FROM
         (
         SELECT
         paymentmethods.id as paymentMethodId,
         paymentmethods.name as paymentMethodName,
+        (
+        SELECT
+        CASE
+        WHEN saleproducts.price * sales.dolarReference < 10000
+        THEN SUM(CEIL(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 100) * 100)
+        ELSE SUM(CEIL(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 1000) * 1000) END AS priceBs
+        FROM saleproducts
+        WHERE saleproducts.saleId = sales.id
+        group by saleproducts.saleId
+        ) as invoiceTotal,
         payments.amount as amount,
+        CASE WHEN payments.paymentMethodId = 2 THEN payments.amount * cash.dolarReference END AS cashToBs,
         payments.currency as currency,
-        CASE WHEN payments.paymentMEthodId = 2 THEN payments.amount * cash.dolarReference END AS cashToBs
+        CASE
+        WHEN payments.paymentMethodId = 2 AND (select cashToBs) < (select invoiceTotal) THEN (select cashToBs) - (select invoiceTotal)
+        WHEN payments.paymentMethodId = 2 AND (select cashToBs) > (select invoiceTotal) THEN (select cashToBs) - (select invoiceTotal)
+        WHEN payments.paymentMethodId != 2 AND payments.amount < (select invoiceTotal) THEN payments.amount - (select invoiceTotal) 
+        WHEN payments.paymentMethodId != 2 AND payments.amount > (select invoiceTotal) THEN payments.amount - (select invoiceTotal) END AS remaining
         FROM payments
         LEFT JOIN cash ON cash.paymentId = payments.id
         INNER JOIN paymentmethods ON paymentmethods.id = payments.paymentMethodId 
+        INNER JOIN sales ON sales.id = payments.saleId
         WHERE DATE(payments.createdAt) BETWEEN DATE(:startDate) AND DATE(:endDate) 
         ) payments
         group by payments.paymentMethodId, payments.currency
