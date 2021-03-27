@@ -28,9 +28,9 @@ module.exports = {
                 products.name as productName,
                 saleproducts.price,
                 CASE
-                WHEN saleproducts.price * sales.dolarReference < 10000
-                THEN CEIL(saleproducts.price * sales.dolarReference / 100) * 100
-                ELSE CEIL(saleproducts.price * sales.dolarReference / 1000) * 1000 END AS priceBs,
+                WHEN saleproducts.price * sales.dolarReference < 100000
+                THEN ROUND(saleproducts.price * sales.dolarReference / 100) * 100
+                ELSE ROUND(saleproducts.price * sales.dolarReference / 1000) * 1000 END AS priceBs,
                 saleproducts.quantity,
                 saleproducts.profitPercent,
                 sales.dolarReference,
@@ -116,8 +116,8 @@ group by payments.saleId
         SELECT
         CASE
         WHEN saleproducts.price * sales.dolarReference < 10000
-        THEN SUM(CEIL(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 100) * 100)
-        ELSE SUM(CEIL(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 1000) * 1000) END AS priceBs
+        THEN SUM(ROUND(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 100) * 100)
+        ELSE SUM(ROUND(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 1000) * 1000) END AS priceBs
         FROM saleproducts
         WHERE saleproducts.saleId = sales.id
         group by saleproducts.saleId
