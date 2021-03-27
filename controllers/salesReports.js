@@ -106,6 +106,7 @@ group by payments.saleId
         SUM(payments.amount) as amount,
         payments.currency,
         ROUND(SUM(payments.cashToBs)) as cashToBs,
+        SUM(payments.invoiceTotal),
         SUM(payments.remaining) as remaining
         FROM
         (
