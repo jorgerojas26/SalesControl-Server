@@ -129,7 +129,7 @@ group by payments.saleId
         FROM
         (
         SELECT
-        SUM(a.paymentAmount) - a.invoiceTotal as remaining
+        SUM(IFNULL(a.paymentAmount, 0)) - a.invoiceTotal as remaining
         FROM
         (
         SELECT
