@@ -99,38 +99,21 @@ INNER JOIN sales ON sales.id = payments.saleId
 WHERE DATE(payments.createdAt) BETWEEN "2021-03-15" AND "2021-03-15"
 group by payments.saleId
          */
-        let response = await sequelizeModel.query(`
+        let paymentReport = await sequelizeModel.query(`
         SELECT
         payments.paymentMethodId,
         payments.paymentMethodName,
         SUM(payments.amount) as amount,
         payments.currency,
-        ROUND(SUM(payments.cashToBs)) as cashToBs,
-        SUM(payments.invoiceTotal),
-        SUM(payments.remaining) as remaining
+        ROUND(SUM(payments.cashToBs)) as cashToBs
         FROM
         (
         SELECT
         paymentmethods.id as paymentMethodId,
         paymentmethods.name as paymentMethodName,
-        (
-        SELECT
-        CASE
-        WHEN saleproducts.price * sales.dolarReference < 10000
-        THEN SUM(ROUND(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 100) * 100)
-        ELSE SUM(ROUND(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 1000) * 1000) END AS priceBs
-        FROM saleproducts
-        WHERE saleproducts.saleId = sales.id
-        group by saleproducts.saleId
-        ) as invoiceTotal,
         payments.amount as amount,
-        CASE WHEN payments.paymentMethodId = 2 THEN payments.amount * cash.dolarReference END AS cashToBs,
-        payments.currency as currency,
-        CASE
-        WHEN payments.paymentMethodId = 2 AND (select cashToBs) < (select invoiceTotal) THEN (select cashToBs) - (select invoiceTotal)
-        WHEN payments.paymentMethodId = 2 AND (select cashToBs) > (select invoiceTotal) THEN (select cashToBs) - (select invoiceTotal)
-        WHEN payments.paymentMethodId != 2 AND payments.amount < (select invoiceTotal) THEN payments.amount - (select invoiceTotal) 
-        WHEN payments.paymentMethodId != 2 AND payments.amount > (select invoiceTotal) THEN payments.amount - (select invoiceTotal) END AS remaining
+        CASE WHEN payments.paymentMethodId = 2 AND payments.currency = "USD" THEN payments.amount * cash.dolarReference END AS cashToBs,
+        payments.currency 
         FROM payments
         LEFT JOIN cash ON cash.paymentId = payments.id
         INNER JOIN paymentmethods ON paymentmethods.id = payments.paymentMethodId 
@@ -139,7 +122,43 @@ group by payments.saleId
         ) payments
         group by payments.paymentMethodId, payments.currency
         `, { replacements: { startDate, endDate }, type: Sequelize.QueryTypes.SELECT });
-        res.send(response);
+
+        let remainingReport = await sequelizeModel.query(`
+        SELECT
+        ROUND(SUM(b.remaining)) as remainingTotal
+        FROM
+        (
+        SELECT
+        SUM(a.paymentAmount) - a.invoiceTotal as remaining
+        FROM
+        (
+        SELECT
+        sales.id as saleId,
+        payments.id as paymentId,
+        CASE
+        WHEN saleproducts.price * sales.dolarReference < 10000
+        THEN SUM(ROUND(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 100) * 100)
+        ELSE SUM(ROUND(((saleproducts.price * sales.dolarReference) * saleproducts.quantity) / 1000) * 1000) END AS invoiceTotal,
+        CASE
+        WHEN payments.paymentMethodId = 2 AND payments.currency = "USD"
+        THEN payments.amount * cash.dolarReference
+        ELSE payments.amount END AS paymentAmount
+        FROM sales
+        INNER JOIN saleproducts ON saleproducts.saleId = sales.id
+        LEFT JOIN payments ON payments.saleId = sales.id
+        LEFT JOIN cash ON cash.paymentId = payments.id
+        WHERE DATE(sales.createdAt) BETWEEN DATE(:startDate) AND DATE(:endDate) 
+        AND sales.fullyPaidDate IS NOT NULL
+        GROUP BY payments.id
+        ) a
+        GROUP BY a.saleId
+        ) b
+        `, { replacements: { startDate, endDate }, type: Sequelize.QueryTypes.SELECT });
+
+        res.send({
+            paymentReport,
+            remainingReport: remainingReport[0]
+        });
 
     },
     debts: async function (req, res) {
