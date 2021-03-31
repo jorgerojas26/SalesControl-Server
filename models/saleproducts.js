@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'sales',
                 foreignKey: 'saleId',
                 sourceKey: 'id',
+                hooks: true
             });
 
             SaleProducts.belongsTo(models.Product, {
@@ -36,6 +37,18 @@ module.exports = (sequelize, DataTypes) => {
             tableName: 'saleproducts',
         },
     );
+
+    SaleProducts.afterCreate(async (saleproduct, options) => {
+        let product = await sequelize.models.Product.findByPk(saleproduct.dataValues.productId);
+        product.stock -= saleproduct.dataValues.quantity;
+        product.save();
+    });
+    SaleProducts.afterDestroy(async (saleproduct, options) => {
+        console.log("holaaaaaaa", saleproduct.dataValues);
+        let product = await sequelize.models.Product.findByPk(saleproduct.dataValues.productId);
+        product.stock += saleproduct.dataValues.quantity;
+        product.save();
+    });
     return SaleProducts;
 };
 

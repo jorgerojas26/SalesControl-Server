@@ -165,7 +165,8 @@ module.exports = {
     destroy: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             let { id } = req.params;
-            await Supplying.destroy({ where: { id } });
+            let supplying = await Supplying.findByPk(id);
+            await supplying.destroy();
             res.sendStatus(204);
         }
         else {

@@ -29,24 +29,18 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Supplying.afterCreate(async (supplying, options) => {
-    sequelize.models.Product.update({
-      price: sequelize.literal(`ROUND(${supplying.price} + (${supplying.price} * (profitPercent / 100)), 2)`)
-    }, {
-      where: {
-        id: supplying.dataValues.productId
-      }
-    })
-  })
+    let product = await sequelize.models.Product.findByPk(supplying.dataValues.productId);
+    supplying.price = parseFloat(supplying.price);
+    product.price = (supplying.price + (supplying.price * (product.profitPercent / 100))).toFixed(2);
+    product.stock += parseFloat(supplying.dataValues.quantity);
+    product.save();
+  });
+
   Supplying.afterDestroy(async (supplying, options) => {
+    let product = await sequelize.models.Product.findByPk(supplying.dataValues.productId);
+    product.stock -= parseFloat(supplying.dataValues.quantity);
+    product.save();
 
-    sequelize.models.Product.update({
-      price: sequelize.literal(`ROUND(${supplying.price} + (${supplying.price} * (profitPercent / 100)), 2)`)
-    }, {
-      where: {
-        id: supplying.dataValues.productId
-      }
-    })
-
-  })
+  });
   return Supplying;
 };

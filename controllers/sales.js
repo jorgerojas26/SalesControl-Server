@@ -374,7 +374,8 @@ module.exports = {
         // res.status(401).json({ error: 'No permitido' });
         if (req.user.permissions >= process.env.MASTER_PERMISSION) {
             let { id } = req.params;
-            await Sales.destroy({ where: { id } });
+            let sale = await Sales.findByPk(id);
+            await sale.destroy();
             res.sendStatus(204);
         } else {
             res.status(401).json({ error: 'Insufficient permissions' });
