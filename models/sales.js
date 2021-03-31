@@ -13,8 +13,7 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'saleProducts',
                 foreignKey: 'saleId',
                 sourceKey: 'id',
-                onDelete: 'cascade',
-                hooks: true
+                onDelete: 'cascade'
             });
 
             Sales.hasMany(models.payment, {
