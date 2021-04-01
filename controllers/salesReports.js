@@ -29,8 +29,8 @@ module.exports = {
                 saleproducts.price,
                 CASE
                 WHEN saleproducts.price * sales.dolarReference < 10000
-                THEN FLOOR((saleproducts.price * sales.dolarReference + 100) / 100) * 100
-                ELSE FLOOR((saleproducts.price * sales.dolarReference + 1000) / 1000) * 1000 END AS priceBs,
+                THEN CEIL(ROUND(saleproducts.price * sales.dolarReference) / 100) * 100
+                ELSE CEIL(ROUND(saleproducts.price * sales.dolarReference) / 1000) * 1000 END AS priceBs,
                 saleproducts.quantity,
                 saleproducts.profitPercent,
                 sales.dolarReference,
@@ -137,8 +137,8 @@ group by payments.saleId
         payments.id as paymentId,
         CASE
         WHEN saleproducts.price * sales.dolarReference < 10000
-        THEN FLOOR((saleproducts.price * sales.dolarReference + 100) / 100) * 100
-        ELSE FLOOR((saleproducts.price * sales.dolarReference + 1000) / 1000) * 1000 END AS priceBs,
+        THEN CEIL(ROUND(saleproducts.price * sales.dolarReference) / 100) * 100
+        ELSE CEIL(ROUND(saleproducts.price * sales.dolarReference) / 1000) * 1000 END AS priceBs,
         SUM((select priceBs) * saleproducts.quantity) as invoiceTotal,
         CASE
         WHEN payments.paymentMethodId = 2 AND payments.currency = "USD"
