@@ -1,10 +1,7 @@
-const Clients = require('../models').Client;
+const Client = require('../models').Client;
 const Sales = require('../models').Sales;
 const SaleProducts = require('../models').SaleProducts;
 const Payment = require('../models').payment;
-const BankTransfer = require('../models').banktransfer;
-const Cash = require('../models').cash;
-const PointOfSale = require('../models').pointofsale;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -13,7 +10,7 @@ const moment = require('moment');
 module.exports = {
     index: async function (req, res, next) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let {id, name, cedula, createdAt, updatedAt, from, to, withDebts, nameOrCedula} = req.query;
+            let { id, name, cedula, createdAt, updatedAt, from, to, withDebts, nameOrCedula } = req.query;
 
             let queryObject = {};
 
@@ -25,17 +22,17 @@ module.exports = {
 
             if (name) {
                 queryObject.where = {
-                    name: {[Op.like]: `%${name}%`},
+                    name: { [Op.like]: `%${name}%` },
                 };
             }
             if (nameOrCedula) {
                 queryObject.where = {
                     [Op.or]: [
                         {
-                            name: {[Op.like]: `%${nameOrCedula}%`},
+                            name: { [Op.like]: `%${nameOrCedula}%` },
                         },
                         {
-                            cedula: {[Op.like]: `%${nameOrCedula}%`},
+                            cedula: { [Op.like]: `%${nameOrCedula}%` },
                         },
                     ],
                 };
@@ -57,7 +54,7 @@ module.exports = {
                             {
                                 model: Payment,
                                 as: 'payment',
-                                include: {all: true},
+                                include: { all: true },
                             },
                         ],
                         separate: true,
@@ -67,7 +64,7 @@ module.exports = {
 
             if (cedula) {
                 queryObject.where = {
-                    cedula: {[Op.like]: `${cedula}%`},
+                    cedula: { [Op.like]: `${cedula}%` },
                 };
             }
 
@@ -92,15 +89,21 @@ module.exports = {
                 queryObject.where = Sequelize.literal(`DATE(Clients.createdAt) BETWEEN "${from}" AND "${to}"`);
             }
             res.queryObject = queryObject;
-            next();
+            let response = await Client.findAll(queryObject);
+            response.map(client => {
+                if (process.env.EMPLOYEE_CED.includes(client.dataValues.cedula)) {
+                    client.dataValues.employee = true;
+                }
+            });
+            res.json(response);
         } else {
-            res.status(401).json({err: 'Insuficcient permissions'});
+            res.status(401).json({ err: 'Insuficcient permissions' });
         }
     },
     create: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
             try {
-                let client = await Clients.create({
+                let client = await Client.create({
                     name: req.body.name,
                     cedula: req.body.cedula,
                     phoneNumber: req.body.phoneNumber,
@@ -109,37 +112,37 @@ module.exports = {
             } catch (error) {
 
                 if (error.errors && error.errors[0].message) {
-                    res.json({error: error.errors[0].message})
+                    res.json({ error: error.errors[0].message });
                 }
                 else {
-                    res.json({error});
+                    res.json({ error });
                 }
             }
         } else {
-            res.status(401).json({err: 'Insuficcient permissions'});
+            res.status(401).json({ err: 'Insuficcient permissions' });
         }
     },
     update: async function (req, res) {
         if (req.user.permissions >= process.env.EMPLOYEE_PERMISSION) {
-            let {id} = req.params;
-            let {name, cedula, phoneNumber} = req.body;
+            let { id } = req.params;
+            let { name, cedula, phoneNumber } = req.body;
 
             if (name != null && cedula != null && phoneNumber != null) {
-                let client = await Clients.update(
+                let client = await Client.update(
                     {
                         name,
                         cedula,
                         phoneNumber,
                     },
-                    {where: {id}},
+                    { where: { id } },
                 );
                 res.status(200).json(client);
             } else {
-                res.status(409).json({error: 'No data provided'});
+                res.status(409).json({ error: 'No data provided' });
             }
         } else {
-            res.status(401).json({error: 'Insufficient permissions'});
+            res.status(401).json({ error: 'Insufficient permissions' });
         }
     },
-    show: function (req, res) {},
+    show: function (req, res) { },
 };
