@@ -90,11 +90,6 @@ module.exports = {
             }
             res.queryObject = queryObject;
             let response = await Client.findAll(queryObject);
-            response.map(client => {
-                if (process.env.EMPLOYEE_CED.includes(client.dataValues.cedula)) {
-                    client.dataValues.employee = true;
-                }
-            });
             res.json(response);
         } else {
             res.status(401).json({ err: 'Insuficcient permissions' });

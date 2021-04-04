@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
             name: DataTypes.TEXT,
             cedula: DataTypes.INTEGER,
             phoneNumber: DataTypes.TEXT,
+            employee: {
+                type: DataTypes.VIRTUAL,
+                get: function () {
+                    return process.env.EMPLOYEE_CED.includes(this.getDataValue("cedula"));
+                }
+            }
         },
         {
             sequelize,
