@@ -135,7 +135,7 @@ module.exports = (sequelize, DataTypes) => {
 
                 sale.dataValues.invoiceTotalBs = finalInvoiceTotalBs;
                 sale.dataValues.paymentTotalBs = paymentTotalBs;
-                sale.dataValues.debtTotal = finalInvoiceTotalBs - paymentTotalBs;
+                sale.dataValues.debtTotal = Math.round(finalInvoiceTotalBs - paymentTotalBs);
                 sale.dataValues.debtCurrency = "Bs";
                 sale.dataValues.products = products;
                 console.log(sale.dataValues);
