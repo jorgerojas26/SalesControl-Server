@@ -126,9 +126,10 @@ module.exports = (sequelize, DataTypes) => {
                         id: saleProduct.productId,
                         name: currentProductInfo.name,
                         imagePath: currentProductInfo.imagePath,
-                        unitPriceBs: (productPriceBs - productDiscount),
+                        unitPriceBs: productPriceBs,
                         quantity: saleProduct.quantity,
-                        totalBs: (productPriceBs - productDiscount) * freezedProductInfo.quantity
+                        totalBs: (productPriceBs - productDiscount) * freezedProductInfo.quantity,
+                        discount: productDiscount
                     });
                 });
 
