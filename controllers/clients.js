@@ -56,6 +56,7 @@ module.exports = {
                                 as: 'payment',
                                 include: { all: true },
                             },
+                            "client"
                         ],
                         separate: true,
                     },

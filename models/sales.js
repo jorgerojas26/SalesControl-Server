@@ -138,6 +138,7 @@ module.exports = (sequelize, DataTypes) => {
                 sale.dataValues.debtTotal = finalInvoiceTotalBs - paymentTotalBs;
                 sale.dataValues.debtCurrency = "Bs";
                 sale.dataValues.products = products;
+                console.log(sale.dataValues);
             }
         }
     });
