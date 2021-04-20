@@ -139,7 +139,7 @@ group by payments.saleId
         WHEN saleproducts.price * sales.dolarReference < 10000
         THEN CEIL(ROUND(saleproducts.price * sales.dolarReference) / 100) * 100
         ELSE CEIL(ROUND(saleproducts.price * sales.dolarReference) / 1000) * 1000 END AS priceBs,
-        SUM((select priceBs) * saleproducts.quantity) as invoiceTotal,
+        ROUND(SUM((select priceBs) * saleproducts.quantity)) as invoiceTotal,
         CASE
         WHEN payments.paymentMethodId = 2 AND payments.currency = "USD"
         THEN payments.amount * cash.dolarReference

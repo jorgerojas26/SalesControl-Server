@@ -18,7 +18,14 @@ module.exports = (sequelize, DataTypes) => {
             employee: {
                 type: DataTypes.VIRTUAL,
                 get: function () {
-                    return process.env.EMPLOYEE_CED.includes(this.getDataValue("cedula"));
+                    let isEmployee = false;
+                    process.env.EMPLOYEE_CED.split(",").map(cedula => {
+                        if (this.getDataValue("cedula") == cedula) {
+                            isEmployee = true;
+                        }
+                    });
+
+                    return isEmployee;
                 }
             }
         },

@@ -54,7 +54,13 @@ module.exports = (sequelize, DataTypes) => {
                 let saleProducts = sale.dataValues.saleProducts || [];
                 let client = sale.dataValues.client;
                 let clientIsEmployee = false;
-                if (client) clientIsEmployee = process.env.EMPLOYEE_CED.includes(client.dataValues.cedula);
+                if (client) {
+                    process.env.EMPLOYEE_CED.split(",").map(cedula => {
+                        if (client.cedula == cedula) {
+                            clientIsEmployee = true;
+                        }
+                    });
+                }
                 let fullyPaidDate = sale.dataValues.fullyPaidDate;
                 let payments = sale.dataValues.payment || [];
                 let products = [];
@@ -138,7 +144,6 @@ module.exports = (sequelize, DataTypes) => {
                 sale.dataValues.debtTotal = Math.round(finalInvoiceTotalBs - paymentTotalBs);
                 sale.dataValues.debtCurrency = "Bs";
                 sale.dataValues.products = products;
-                console.log(sale.dataValues);
             }
         }
     });
