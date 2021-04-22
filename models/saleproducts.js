@@ -36,19 +36,20 @@ module.exports = (sequelize, DataTypes) => {
             tableName: 'saleproducts',
         },
     );
-
-    SaleProducts.afterCreate(async (saleproduct, options) => {
-        let transaction = options.transaction;
-        let product = await sequelize.models.Product.findByPk(saleproduct.dataValues.productId, { transaction });
-        product.stock -= saleproduct.dataValues.quantity;
-        await product.save({ transaction });
-    });
-    SaleProducts.afterDestroy(async (saleproduct, options) => {
-        let transaction = options.transaction;
-        let product = await sequelize.models.Product.findByPk(saleproduct.dataValues.productId, { transaction });
-        product.stock += saleproduct.dataValues.quantity;
-        await product.save({ transaction });
-    });
+    /*
+        SaleProducts.afterCreate(async (saleproduct, options) => {
+            let transaction = options.transaction;
+            let product = await sequelize.models.Product.findByPk(saleproduct.dataValues.productId, { transaction });
+            product.stock -= saleproduct.dataValues.quantity;
+            await product.save({ transaction });
+        });
+        SaleProducts.afterDestroy(async (saleproduct, options) => {
+            let transaction = options.transaction;
+            let product = await sequelize.models.Product.findByPk(saleproduct.dataValues.productId, { transaction });
+            product.stock += saleproduct.dataValues.quantity;
+            await product.save({ transaction });
+        });*
+        */
     return SaleProducts;
 };
 

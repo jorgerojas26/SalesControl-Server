@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     tableName: "supplyings"
   });
 
+  /*
   Supplying.afterCreate(async (supplying, options) => {
     let product = await sequelize.models.Product.findByPk(supplying.dataValues.productId);
     supplying.price = parseFloat(supplying.price);
@@ -42,5 +43,6 @@ module.exports = (sequelize, DataTypes) => {
     product.save();
 
   });
+  */
   return Supplying;
 };
