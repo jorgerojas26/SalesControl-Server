@@ -28,18 +28,18 @@ module.exports = (sequelize, DataTypes) => {
     tableName: "supplyings"
   });
 
-  /*
   Supplying.afterCreate(async (supplying, options) => {
     let product = await sequelize.models.Product.findByPk(supplying.dataValues.productId);
     supplying.price = parseFloat(supplying.price);
     product.price = (supplying.price + (supplying.price * (product.profitPercent / 100))).toFixed(2);
-    product.stock += parseFloat(supplying.dataValues.quantity);
+    //product.stock += parseFloat(supplying.dataValues.quantity);
     product.save();
   });
 
+  /*
   Supplying.afterDestroy(async (supplying, options) => {
     let product = await sequelize.models.Product.findByPk(supplying.dataValues.productId);
-    product.stock -= parseFloat(supplying.dataValues.quantity);
+    //product.stock -= parseFloat(supplying.dataValues.quantity);
     product.save();
 
   });
