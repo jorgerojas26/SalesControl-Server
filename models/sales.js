@@ -1,6 +1,8 @@
 'use strict';
 const { Model } = require('sequelize');
 const { roundUpProductPrice } = require("../helpers/products");
+const moment = require('moment');
+
 module.exports = (sequelize, DataTypes) => {
     class Sales extends Model {
         static associate(models) {
@@ -90,12 +92,12 @@ module.exports = (sequelize, DataTypes) => {
                 saleProducts.map(saleProduct => {
                     let freezedProductInfo = saleProduct.dataValues;
                     let currentProductInfo = saleProduct.dataValues.product.dataValues;
-
-                    freezedInvoiceTotalBs += freezedProductInfo.price * freezedDolarReference;
-                    invoiceTotalBs += currentProductInfo.price * currentDolarReference;
+                    freezedInvoiceTotalBs += freezedProductInfo.price * freezedDolarReference * saleProduct.quantity;
+                    invoiceTotalBs += currentProductInfo.price * currentDolarReference * saleProduct.quantity;
                 });
 
-                if (paymentTotalBs < freezedInvoiceTotalBs) {
+                if (paymentTotalBs == 0 && paymentTotalBs < freezedInvoiceTotalBs
+                    || paymentTotalBs > 0 && paymentTotalBs < invoiceTotalBs) {
                     debtor = "client";
                 }
                 else if (paymentTotalBs > freezedInvoiceTotalBs) {
@@ -120,7 +122,6 @@ module.exports = (sequelize, DataTypes) => {
                         else if (debtor == "client") {
                             let freezedProductPrice = roundUpProductPrice(Math.round(freezedProductInfo.price * freezedDolarReference));
                             let currentProductPrice = roundUpProductPrice(Math.round(currentProductInfo.price * currentDolarReference));
-
                             productPriceBs = freezedProductPrice >= currentProductPrice ? freezedProductPrice : currentProductPrice;
                         }
                         productDiscount = clientIsEmployee
@@ -138,6 +139,19 @@ module.exports = (sequelize, DataTypes) => {
                         discount: productDiscount
                     });
                 });
+
+                if (debtor == "client") {
+                    let saleDate = moment(sale.createdAt, "DD-MM-YYYY HH:mm:ss");
+                    let currentDate = moment(new Date(), "DD-MM-YYYY HH:mm:ss");
+                    let diffDays = currentDate.diff(saleDate, "days");
+                    if (diffDays > 1) {
+                        console.log(diffDays);
+                        for (let i = 0; i < diffDays - 1; i++) {
+                            finalInvoiceTotalBs += Math.round(finalInvoiceTotalBs * 0.05);
+                        }
+                        finalInvoiceTotalBs = roundUpProductPrice(finalInvoiceTotalBs);
+                    }
+                }
 
                 sale.dataValues.invoiceTotalBs = finalInvoiceTotalBs;
                 sale.dataValues.paymentTotalBs = paymentTotalBs;
