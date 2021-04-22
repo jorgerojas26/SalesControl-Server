@@ -140,24 +140,26 @@ module.exports = (sequelize, DataTypes) => {
                     });
                 });
 
-                if (debtor == "client") {
-                    let saleDate = moment(sale.createdAt, "DD-MM-YYYY HH:mm:ss");
-                    let currentDate = moment(new Date(), "DD-MM-YYYY HH:mm:ss");
-                    let diffDays = currentDate.diff(saleDate, "days");
-                    if (diffDays > 1) {
-                        console.log(diffDays);
-                        for (let i = 0; i < diffDays - 1; i++) {
-                            finalInvoiceTotalBs += Math.round(finalInvoiceTotalBs * 0.05);
-                        }
-                        finalInvoiceTotalBs = roundUpProductPrice(finalInvoiceTotalBs);
-                    }
-                }
 
                 sale.dataValues.invoiceTotalBs = finalInvoiceTotalBs;
                 sale.dataValues.paymentTotalBs = paymentTotalBs;
                 sale.dataValues.debtTotal = Math.round(finalInvoiceTotalBs - paymentTotalBs);
                 sale.dataValues.debtCurrency = "Bs";
                 sale.dataValues.products = products;
+
+                if (debtor == "client") {
+                    let saleDate = moment(sale.createdAt, "DD-MM-YYYY HH:mm:ss");
+                    let currentDate = moment(new Date(), "DD-MM-YYYY HH:mm:ss");
+                    let diffDays = currentDate.diff(saleDate, "days");
+
+                    if (diffDays > 1) {
+                        console.log(diffDays);
+                        for (let i = 0; i < diffDays - 1; i++) {
+                            sale.dataValues.debtTotal += Math.round(sale.dataValues.debtTotal * 0.05);
+                        }
+                        sale.dataValues.debtTotal = roundUpProductPrice(sale.dataValues.debtTotal);
+                    }
+                }
             }
         }
     });
