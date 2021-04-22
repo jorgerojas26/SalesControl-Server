@@ -211,7 +211,7 @@ module.exports = {
 
                             for (let payment of payments) {
                                 if (payment.paymentMethodId != null && payment.amount != null && payment.currency && payment.paymentDetails) {
-                                    if (payment.amount > 0) {
+                                    if (payment.amount > 0 || (payment.amount == 0 && payment.payingDebtInfo)) {
                                         let paymentDetails = payment.paymentDetails;
                                         if (payment.paymentMethodId == 1) {
                                             if (paymentDetails.ticketId) {
@@ -228,14 +228,17 @@ module.exports = {
                                                     };
                                                     await sale.createPayment(pm, { transaction: t, include: 'pointofsale' },);
                                                     if (payment.payingDebtInfo) {
+                                                        console.log(payment.payingDebtInfo);
+                                                        console.log("DEBT INFOOOOOOOOOOOOOOO");
                                                         for (let debtInfo of payment.payingDebtInfo) {
-                                                            await Payment.create({
+                                                            let payd = await Payment.create({
                                                                 ...pm,
                                                                 amount: debtInfo.amount,
                                                                 saleId: debtInfo.saleId,
                                                             }, {
                                                                 transaction: t, include: "pointofsale", fullyPaid: debtInfo.fullyPaid
                                                             });
+                                                            console.log(payd);
 
                                                         }
                                                     }
